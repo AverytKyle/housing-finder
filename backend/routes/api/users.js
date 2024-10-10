@@ -11,7 +11,7 @@ const router = express.Router();
 
 // Sign up
 router.post('/', async (req, res) => {
-    const { email, password, username } = req.body;
+    const { email, password, username, firstName, lastName } = req.body;
     const hashedPassword = bcrypt.hashSync(password);
     const user = await User.create({ email, username, hashedPassword });
 
@@ -19,6 +19,8 @@ router.post('/', async (req, res) => {
         id: user.id,
         email: user.email,
         username: user.username,
+        firstName: firstName,
+        lastName: lastName
     };
 
     await setTokenCookie(res, safeUser);
@@ -51,25 +53,33 @@ const validateSignup = [
         .withMessage('Password is required.')
         .isLength({ min: 6 })
         .withMessage('Password must be 6 characters or more.'),
+    check('firstName')
+        .exists({ checkFalsy: true })
+        .notEmpty(),
+    check('lastName')
+        .exists({ checkFalsy: true })
+        .notEmpty(),
     handleValidationErrors
 ];
 
 router.post('/', validateSignup, async (req, res) => {
-        const { email, password, username } = req.body;
-        const hashedPassword = bcrypt.hashSync(password);
-        const user = await User.create({ email, username, hashedPassword });
+    const { email, password, username, firstName, lastName } = req.body;
+    const hashedPassword = bcrypt.hashSync(password);
+    const user = await User.create({ email, username, hashedPassword });
 
-        const safeUser = {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-        };
+    const safeUser = {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        firstName: firstName,
+        lastName: lastName
+    };
 
-        await setTokenCookie(res, safeUser);
+    await setTokenCookie(res, safeUser);
 
-        return res.json({
-            user: safeUser
-        });
+    return res.json({
+        user: safeUser
     });
+});
 
 module.exports = router;
