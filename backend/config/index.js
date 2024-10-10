@@ -1,6 +1,6 @@
 module.exports = {
     environment: process.env.NODE_ENV || 'development',
-    port: 5432,
+    port: process.env.PORT || 8000,
     dbFile: process.env.DB_FILE,
     jwtConfig: {
         secret: process.env.JWT_SECRET,
