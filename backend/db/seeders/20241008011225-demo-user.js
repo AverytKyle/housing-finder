@@ -14,7 +14,7 @@ options.tableName = 'Users';
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await User.bulkCreate(options, [
+    await User.bulkCreate([
       {
         email: 'demo@user.io',
         username: 'Demo-lition',
@@ -42,7 +42,7 @@ module.exports = {
   async down (queryInterface, Sequelize) {
 
     const Op = Sequelize.Op;
-    return queryInterface.bulkDelete(options, {
+    return queryInterface.bulkDelete({
       username: { [Op.in]: ['Demo-lition', 'FakeUser1', 'FakeUser2'] }
     }, {});
   }

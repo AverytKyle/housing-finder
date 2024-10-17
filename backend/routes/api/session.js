@@ -10,39 +10,6 @@ const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 
-router.post('/', async (req, res, next) => {
-    const { credential, password } = req.body;
-
-    const user = await User.unscoped().findOne({
-        where: {
-            [Op.or]: {
-                username: credential,
-                email: credential
-            }
-        }
-    });
-
-    if (!user || !bcrypt.compareSync(password, user.hashedPassword.toString())) {
-        const err = new Error('Login failed');
-        err.status = 401;
-        err.title = 'Login failed';
-        err.errors = { credential: 'The provided credentials were invalid.' };
-        return next(err);
-    }
-
-    const safeUser = {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-    };
-
-    await setTokenCookie(res, safeUser);
-
-    return res.json({
-        user: safeUser
-    });
-});
-
 // Log out
 router.delete('/', (_req, res) => {
     res.clearCookie('token');
@@ -56,6 +23,8 @@ router.get('/', (req, res) => {
             id: user.id,
             email: user.email,
             username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName
         };
         return res.json({
             user: safeUser
@@ -63,16 +32,17 @@ router.get('/', (req, res) => {
     } else return res.json({ user: null });
 });
 
+// Validation middleware for login --updated with 400 code validation feature
 const validateLogin = [
     check('credential')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Please provide a valid email or username.'),
+      .exists({ checkFalsy: true })
+      .notEmpty()
+      .withMessage('Please provide a valid email or username.'), // Credential is required
     check('password')
-        .exists({ checkFalsy: true })
-        .withMessage('Please provide a password.'),
-    handleValidationErrors
-];
+      .exists({ checkFalsy: true })
+      .withMessage('Please provide a password.'), // Password is required
+    handleValidationErrors,  // Handle any validation errors and return 400 status
+  ];
 
 // Log in
 router.post('/', validateLogin,

@@ -62,6 +62,7 @@ app.use((err, _req, _res, next) => {
     }
     err.title = 'Validation error';
     err.errors = errors;
+    err.status = 400;
   }
   next(err);
 });

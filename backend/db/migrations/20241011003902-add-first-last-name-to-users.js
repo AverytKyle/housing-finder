@@ -13,7 +13,7 @@ module.exports = {
     await queryInterface.addColumn(options, 'firstName', {
       type: Sequelize.STRING,
       allowNull: true
-    }, options);
+    });
     await queryInterface.addColumn(options, 'lastName', {
       type: Sequelize.STRING,
       allowNull: true
