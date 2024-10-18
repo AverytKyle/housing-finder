@@ -1,156 +1,202 @@
 const express = require('express');
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
-
 const { Spot, Booking } = require('../../db/models');
-
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
+const { requireAuth } = require('../../utils/auth');
 
 const router = express.Router();
 
+// GET /api/spots - Retrieve all spots
 router.get('/', async (req, res, next) => {
-    const spots = await Spot.findAll();
-
-    res.json(spots);
+  const spots = await Spot.findAll();
+  res.json(spots);
 });
 
+// Validation middleware for creating a spot
 const validateSpot = [
-    check('address')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Address is required.'),
-    check('city')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('City is required.'),
-    check('state')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('State is required.'),
-    check('country')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Country is required.'),
-    check('lat')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Latitude is required.')
-        .isLength({ max: 10 }),
-    check('lng')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Longitude is required.')
-        .isLength({ max: 12 }),
-    check('name')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Name is required.'),
-    check('description')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Description is required.'),
-    check('price')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Price is required.'),
-    handleValidationErrors
-]
+  check('address')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage('Address is required.'),
+  check('city')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage('City is required.'),
+  check('state')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage('State is required.'),
+  check('country')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage('Country is required.'),
+  check('lat')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage('Latitude is required.')
+    .isLength({ max: 10 }),
+  check('lng')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage('Longitude is required.')
+    .isLength({ max: 12 }),
+  check('name')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage('Name is required.'),
+  check('description')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage('Description is required.'),
+  check('price')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage('Price is required.'),
+  handleValidationErrors
+];
 
-router.post('/', validateSpot, async (req, res, next) => {
-    const { user } = req;
+// POST /api/spots - Create a new spot
+router.post('/', requireAuth, validateSpot, async (req, res, next) => {
+  const { user } = req;
+  const { address, city, state, country, lat, lng, name, description, price } = req.body;
 
-    const { address, city, state, country, lat, lng, name, description, price } = req.body;
-
+  try {
     const spot = await Spot.create({
-        ownerId: user.id,
-        address,
-        city,
-        state,
-        country,
-        lat,
-        lng,
-        name,
-        description,
-        price
+      ownerId: user.id,
+      address,
+      city,
+      state,
+      country,
+      lat,
+      lng,
+      name,
+      description,
+      price
     });
 
     res.json(spot);
+  } catch (err) {
+    next(err);
+  }
+});
 
-})
-
+// Validation middleware for booking dates
 const validateBooking = [
-    check('startDate')
-        .exists({ checkFalsy: true })
-        .withMessage('Start date is required'),
-    check('endDate')
-        .exists({ checkFalsy: true })
-        .withMessage('End date is required'),
-    handleValidationErrors
+  check('startDate')
+    .exists({ checkFalsy: true })
+    .withMessage('Start date is required.')
+    .isISO8601()
+    .withMessage('Need a valid start date.'),
+  check('endDate')
+    .exists({ checkFalsy: true })
+    .withMessage('End date is required.')
+    .isISO8601()
+    .withMessage('Need a valid end date.'),
+  (req, res, next) => {
+    const { startDate, endDate } = req.body;
+
+    // Check if endDate is after startDate
+    if (new Date(endDate) <= new Date(startDate)) {
+      return res.status(400).json({
+        errors: [
+          {
+            msg: 'End date must be after start date.',
+            param: 'endDate',
+            location: 'body',
+          },
+        ],
+      });
+    }
+
+    // Check if dates are in the past
+    const currentDate = new Date();
+    if (new Date(startDate) < currentDate || new Date(endDate) < currentDate) {
+      return res.status(400).json({
+        errors: [
+          {
+            msg: 'Dates cannot be in the past.',
+            param: 'startDate',
+            location: 'body',
+          },
+        ],
+      });
+    }
+    next();
+  },
 ];
 
-router.post('/:spotId/bookings', validateBooking, async (req, res, next) => {
-    const { user } = req;
-    const { startDate, endDate } = req.body;
-    const { spotId } = req.params;
+// POST /api/spots/:spotId/bookings - Create a booking
+router.post('/:spotId/bookings', requireAuth, validateBooking, async (req, res, next) => {
+  const { user } = req;
+  const { startDate, endDate } = req.body;
+  const { spotId } = req.params;
 
+  try {
     const spot = await Spot.findByPk(spotId);
-
     if (!spot) {
-        const err = new Error('Spot not found');
-        err.status = 404;
-        return next(err);
-    };
+      const err = new Error('Spot not found');
+      err.status = 404;
+      return next(err);
+    }
 
     if (user.id === spot.ownerId) {
-        const err = new Error('You cannot book your own spot');
-        err.status = 403;
-        return next(err);
-    };
+      const err = new Error('You cannot book your own spot');
+      err.status = 403;
+      return next(err);
+    }
 
-    const badbooking = await Booking.findOne({
-        where: {
-            spotId: spot.id,
-            startDate: {
-                [Op.between]: [startDate, endDate]
-            },
-            endDate: {
-                [Op.between]: [startDate, endDate]
-            },
-            [Op.or]: [{
-                startDate: { [Op.lte]: startDate },
-            },
-            {
-                endDate: { [Op.gte]: endDate }
-            }]
-        }
+    const conflictingBooking = await Booking.findOne({
+      where: {
+        spotId: spot.id,
+        [Op.or]: [
+          { startDate: { [Op.between]: [startDate, endDate] } },
+          { endDate: { [Op.between]: [startDate, endDate] } },
+          {
+            [Op.and]: [
+              { startDate: { [Op.lte]: startDate } },
+              { endDate: { [Op.gte]: endDate } }
+            ]
+          }
+        ]
+      }
     });
 
-    if (badbooking) {
-        const err = new Error('Booking conflict');
-        err.status = 403;
-        return next(err);
-    };
+    if (conflictingBooking) {
+      const err = new Error('Conflict: existing reservation');
+      err.status = 403;
+      return next(err);
+    }
 
     const booking = await Booking.create({
-        userId: user.id,
-        spotId: spot.id,
-        startDate,
-        endDate
+      userId: user.id,
+      spotId: spot.id,
+      startDate,
+      endDate
     });
 
-    return res.status(200).json(booking);
-})
+    return res.status(201).json(booking);
+  } catch (err) {
+    next(err);
+  }
+});
 
+// DELETE /api/spots/:spotId - Delete a spot
 router.delete('/:spotId', async (req, res, next) => {
-    const spotId = req.params.spotId;
+  const spotId = req.params.spotId;
 
+  try {
     const spot = await Spot.findByPk(spotId);
-    await spot.destroy();
+    if (!spot) {
+      return res.status(404).json({ message: 'Spot not found' });
+    }
 
-    res.json({
-        message: 'Success!'
-    })
-})
+    await spot.destroy();
+    res.json({ message: 'Successfully deleted' });
+  } catch (err) {
+    next(err);
+  }
+});
 
 module.exports = router;
