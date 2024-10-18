@@ -1,9 +1,5 @@
 const express = require('express');
-const { Op } = require('sequelize');
-const bcrypt = require('bcryptjs');
 
-const { setTokenCookie, restoreUser } = require('../../utils/auth');
-const { User } = require('../../db/models');
 const { Spot } = require('../../db/models');
 
 const { check } = require('express-validator');
@@ -43,7 +39,7 @@ const validateSpot = [
         .exists({ checkFalsy : true})
         .notEmpty()
         .withMessage('Longitude is required.')
-        .isLength({ max: 11 }),
+        .isLength({ max: 12 }),
     check('name')
         .exists({ checkFalsy : true})
         .notEmpty()
