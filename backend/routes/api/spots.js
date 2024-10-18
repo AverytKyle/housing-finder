@@ -54,7 +54,7 @@ const validateSpot = [
         .withMessage('Price is required.'),
     handleValidationErrors
 ]
-    
+
 router.post('/', validateSpot, async (req, res, next) => {
     const { user } = req;
 
@@ -75,6 +75,63 @@ router.post('/', validateSpot, async (req, res, next) => {
 
     res.json(spot);
 
+})
+
+const validateBooking = [
+    check('startDate')
+    .exists({ checkFalsy: true })
+    .withMessage('Start date is required'),
+    check('endDate')
+    .exists({ checkFalsy: true })
+    .withMessage('End date is required'),
+    handleValidationErrors
+    ];
+
+router.post('/:spotId/bookings', validateBooking, async (req, res, next) => {
+    const { user } = req;
+    const { startDate, endDate } = req.body;
+    const { spotId } = req.params;
+
+    const spot = await Spot.findByPk(spotId);
+
+    if (!spot) {
+        const err = new Error('Spot not found');
+        err.status = 404;
+        return next(err);
+    };
+
+    if (user.id === spot.ownerId) {
+        const err = new Error('You cannot book your own spot');
+        err.status = 403;
+        return next(err);
+    };
+
+    const badbooking = await Booking.findOne({
+        where: {
+            spotId: spot.id,
+            startDate: {
+                [Op.between]: [startDate, endDate]
+            },
+            endDate: {
+                [Op.between]: [startDate, endDate]
+            }
+        }
+    });
+
+    if (badbooking) {
+        const err = new Error('Booking conflict');
+        err.status = 403;
+        return next(err);
+    };
+
+    const booking = await Booking.create({
+        userId: user.id,
+        spotId: spot.id,
+        startDate,
+        endDate
+    });
+
+    return res.status(200).json(booking);
 })
 
 router.delete('/:spotId', async (req, res, next) => {
