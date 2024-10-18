@@ -1,6 +1,8 @@
 const express = require('express');
+const { Op } = require('sequelize');
+const bcrypt = require('bcryptjs');
 
-const { Spot } = require('../../db/models');
+const { Spot, Booking } = require('../../db/models');
 
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
@@ -15,41 +17,41 @@ router.get('/', async (req, res, next) => {
 
 const validateSpot = [
     check('address')
-        .exists({ checkFalsy : true})
+        .exists({ checkFalsy: true })
         .notEmpty()
         .withMessage('Address is required.'),
     check('city')
-        .exists({ checkFalsy : true})
+        .exists({ checkFalsy: true })
         .notEmpty()
         .withMessage('City is required.'),
     check('state')
-        .exists({ checkFalsy : true})
+        .exists({ checkFalsy: true })
         .notEmpty()
         .withMessage('State is required.'),
     check('country')
-        .exists({ checkFalsy : true})
+        .exists({ checkFalsy: true })
         .notEmpty()
         .withMessage('Country is required.'),
     check('lat')
-        .exists({ checkFalsy : true})
+        .exists({ checkFalsy: true })
         .notEmpty()
         .withMessage('Latitude is required.')
         .isLength({ max: 10 }),
     check('lng')
-        .exists({ checkFalsy : true})
+        .exists({ checkFalsy: true })
         .notEmpty()
         .withMessage('Longitude is required.')
         .isLength({ max: 12 }),
     check('name')
-        .exists({ checkFalsy : true})
+        .exists({ checkFalsy: true })
         .notEmpty()
         .withMessage('Name is required.'),
     check('description')
-        .exists({ checkFalsy : true})
+        .exists({ checkFalsy: true })
         .notEmpty()
         .withMessage('Description is required.'),
     check('price')
-        .exists({ checkFalsy : true})
+        .exists({ checkFalsy: true })
         .notEmpty()
         .withMessage('Price is required.'),
     handleValidationErrors
@@ -79,13 +81,13 @@ router.post('/', validateSpot, async (req, res, next) => {
 
 const validateBooking = [
     check('startDate')
-    .exists({ checkFalsy: true })
-    .withMessage('Start date is required'),
+        .exists({ checkFalsy: true })
+        .withMessage('Start date is required'),
     check('endDate')
-    .exists({ checkFalsy: true })
-    .withMessage('End date is required'),
+        .exists({ checkFalsy: true })
+        .withMessage('End date is required'),
     handleValidationErrors
-    ];
+];
 
 router.post('/:spotId/bookings', validateBooking, async (req, res, next) => {
     const { user } = req;
@@ -114,7 +116,13 @@ router.post('/:spotId/bookings', validateBooking, async (req, res, next) => {
             },
             endDate: {
                 [Op.between]: [startDate, endDate]
-            }
+            },
+            [Op.or]: [{
+                startDate: { [Op.lte]: startDate },
+            },
+            {
+                endDate: { [Op.gte]: endDate }
+            }]
         }
     });
 
