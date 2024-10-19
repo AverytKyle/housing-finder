@@ -16,46 +16,48 @@ router.get('/', async (req, res, next) => {
 
 // Validation middleware for creating a spot
 const validateSpot = [
-  check('address')
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .withMessage('Address is required.'),
-  check('city')
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .withMessage('City is required.'),
-  check('state')
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .withMessage('State is required.'),
-  check('country')
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .withMessage('Country is required.'),
-  check('lat')
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .withMessage('Latitude is required.')
-    .isLength({ max: 10 }),
-  check('lng')
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .withMessage('Longitude is required.')
-    .isLength({ max: 12 }),
-  check('name')
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .withMessage('Name is required.'),
-  check('description')
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .withMessage('Description is required.'),
-  check('price')
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .withMessage('Price is required.'),
-  handleValidationErrors
-];
+    check('address')
+      .exists({ checkFalsy: true })
+      .notEmpty()
+      .withMessage('Address is required.'),
+    check('city')
+      .exists({ checkFalsy: true })
+      .notEmpty()
+      .withMessage('City is required.'),
+    check('state')
+      .exists({ checkFalsy: true })
+      .notEmpty()
+      .withMessage('State is required.'),
+    check('country')
+      .exists({ checkFalsy: true })
+      .notEmpty()
+      .withMessage('Country is required.'),
+    check('lat')
+      .exists({ checkFalsy: true })
+      .notEmpty()
+      .withMessage('Latitude is required.')
+      .isFloat({ min: -90, max: 90 })
+      .withMessage('Latitude must be between -90 and 90.'),
+    check('lng')
+      .exists({ checkFalsy: true })
+      .notEmpty()
+      .withMessage('Longitude is required.')
+      .isFloat({ min: -180, max: 180 })
+      .withMessage('Longitude must be between -180 and 180.'),
+    check('name')
+      .exists({ checkFalsy: true })
+      .notEmpty()
+      .withMessage('Name is required.'),
+    check('description')
+      .exists({ checkFalsy: true })
+      .notEmpty()
+      .withMessage('Description is required.'),
+    check('price')
+      .exists({ checkFalsy: true })
+      .notEmpty()
+      .withMessage('Price is required.'),
+    handleValidationErrors
+  ];
 
 // POST /api/spots - Create a new spot
 router.post('/', requireAuth, validateSpot, async (req, res, next) => {
@@ -236,6 +238,64 @@ router.get('/:spotId/bookings', requireAuth, async (req, res, next) => {
       next(err);
     }
   });
+
+  // PUT /api/spots/:spotId - Updates an existing spot
+router.put('/:spotId', requireAuth, validateSpot, async (req, res, next) => {
+    const { spotId } = req.params;
+    const { user } = req;
+    const { address, city, state, country, lat, lng, name, description, price } = req.body;
+
+    try {
+      // Check spot exist
+      const spot = await Spot.findByPk(spotId);
+      if (!spot) {
+        return res.status(404).json({
+          message: 'Spot not found',
+        });
+      }
+
+      // Check if user is owner
+      if (spot.ownerId !== user.id) {
+        return res.status(403).json({
+          message: 'Unauthorized: You are not the owner of this spot',
+        });
+      }
+
+      // new data
+      await spot.update({
+        address,
+        city,
+        state,
+        country,
+        lat,
+        lng,
+        name,
+        description,
+        price
+      });
+
+      // Return the updated spot data
+      return res.json({
+        id: spot.id,
+        ownerId: spot.ownerId,
+        address: spot.address,
+        city: spot.city,
+        state: spot.state,
+        country: spot.country,
+        lat: spot.lat,
+        lng: spot.lng,
+        name: spot.name,
+        description: spot.description,
+        price: spot.price,
+        createdAt: spot.createdAt,
+        updatedAt: spot.updatedAt,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+
 
 // DELETE /api/spots/:spotId - Delete a spot
 router.delete('/:spotId', async (req, res, next) => {
