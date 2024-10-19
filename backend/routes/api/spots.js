@@ -1,7 +1,7 @@
 const express = require('express');
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
-const { Spot, Booking } = require('../../db/models');
+const { Spot, Booking, User } = require('../../db/models');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const { requireAuth } = require('../../utils/auth');
@@ -81,6 +81,25 @@ router.post('/', requireAuth, validateSpot, async (req, res, next) => {
     next(err);
   }
 });
+
+router.get('/:spotId', async (req, res, next) => {
+    const { spotId } = req.params;
+
+    const spot = await Spot.findByPk(spotId);
+    // console.log(spot)
+    const ownerId = spot.ownerId;
+    const owner = await User.findByPk(ownerId)
+
+    res.json({
+        spot,
+        User: {
+            id: owner.id,
+            firstName: owner.firstName,
+            lastName: owner.lastName
+        }
+    })
+
+})
 
 // Validation middleware for booking dates
 const validateBooking = [
