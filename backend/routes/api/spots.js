@@ -86,6 +86,35 @@ router.post('/', requireAuth, validateSpot, async (req, res, next) => {
   }
 });
 
+// GET /api/spots/current - Returns all spots owned by the current user
+router.get('/current', requireAuth, async (req, res, next) => {
+    const { user } = req;
+
+    try {
+      const spots = await Spot.findAll({
+        where: {
+          ownerId: user.id,
+        },
+        include: [
+          {
+            model: SpotImage,
+            attributes: ['id', 'url', 'preview'],
+          },
+          {
+            model: User,
+            attributes: ['id', 'firstName', 'lastName'],
+          },
+        ],
+      });
+
+      return res.json(spots);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+
+// GET /api/spots/:spotId/bookings - Returns all bookings for a specified spot
 router.get('/:spotId', async (req, res, next) => {
     const { spotId } = req.params;
 
