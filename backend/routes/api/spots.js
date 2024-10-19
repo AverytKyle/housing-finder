@@ -336,6 +336,8 @@ router.get('/:spotId/bookings', requireAuth, async (req, res, next) => {
     }
   });
 
+  
+
   // PUT /api/spots/:spotId - Updates an existing spot
 router.put('/:spotId', requireAuth, validateSpot, async (req, res, next) => {
     const { spotId } = req.params;

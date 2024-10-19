@@ -10,21 +10,16 @@ const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 
-// Log out
-router.delete('/', (_req, res) => {
-    res.clearCookie('token');
-    return res.json({ message: 'success' });
-});
 
-router.get('/', (req, res) => {
+
+router.get('/', restoreUser, (req, res) => {
     const { user } = req;
     if (user) {
         const safeUser = {
             id: user.id,
             email: user.email,
-            // username: user.username,
             firstName: user.firstName,
-            lastName: user.lastName
+            lastName: user.lastName,
         };
         return res.json({
             user: safeUser
@@ -68,6 +63,8 @@ router.post('/', validateLogin,
 
         const safeUser = {
             id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
             username: user.username,
         };
@@ -78,5 +75,11 @@ router.post('/', validateLogin,
             user: safeUser
         });
     });
+
+    // Log out
+router.delete('/', (_req, res) => {
+    res.clearCookie('token');
+    return res.json({ message: 'success' });
+});
 
 module.exports = router;
