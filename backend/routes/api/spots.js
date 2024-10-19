@@ -182,6 +182,61 @@ router.post('/:spotId/bookings', requireAuth, validateBooking, async (req, res, 
   }
 });
 
+// GET /api/spots/:spotId/bookings - Returns all bookings for a specified spot
+router.get('/:spotId/bookings', requireAuth, async (req, res, next) => {
+    const { spotId } = req.params;
+    const { user } = req; // authenticated user
+
+    try {
+      // does spot exists
+      const spot = await Spot.findByPk(spotId);
+      if (!spot) {
+        return res.status(404).json({
+          message: 'Spot not found',
+        });
+      }
+
+      // get bookings for the specified spot
+      const bookings = await Booking.findAll({
+        where: { spotId },
+        include: user.id === spot.ownerId ? [{
+          model: User,
+          attributes: ['id', 'firstName', 'lastName'],
+        }] : [], // Include User only if the authenticated user is owner
+      });
+
+      // Map bookings
+      const response = bookings.map(booking => {
+        if (user.id === spot.ownerId) {
+          return {
+            id: booking.id,
+            spotId: booking.spotId,
+            userId: booking.userId,
+            startDate: booking.startDate,
+            endDate: booking.endDate,
+            createdAt: booking.createdAt,
+            updatedAt: booking.updatedAt,
+            User: {
+              id: booking.User.id,
+              firstName: booking.User.firstName,
+              lastName: booking.User.lastName,
+            },
+          };
+        } else {
+          return {
+            spotId: booking.spotId,
+            startDate: booking.startDate,
+            endDate: booking.endDate,
+          };
+        }
+      });
+
+      return res.json(response);
+    } catch (err) {
+      next(err);
+    }
+  });
+
 // DELETE /api/spots/:spotId - Delete a spot
 router.delete('/:spotId', async (req, res, next) => {
   const spotId = req.params.spotId;
