@@ -1,7 +1,8 @@
 const express = require('express');
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const bcrypt = require('bcryptjs');
-const { Spot, Booking, User } = require('../../db/models');
+//added spotimage and review
+const { Spot, Booking, User, SpotImage, Review } = require('../../db/models');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const { requireAuth } = require('../../utils/auth');
@@ -61,12 +62,13 @@ const validateSpot = [
 
 // POST /api/spots - Create a new spot
 router.post('/', requireAuth, validateSpot, async (req, res, next) => {
-  const { user } = req;
+
   const { address, city, state, country, lat, lng, name, description, price } = req.body;
+  const ownerId = req.user.id; // Use the authenticated user's id
 
   try {
     const spot = await Spot.create({
-      ownerId: user.id,
+      ownerId,
       address,
       city,
       state,
@@ -87,21 +89,68 @@ router.post('/', requireAuth, validateSpot, async (req, res, next) => {
 router.get('/:spotId', async (req, res, next) => {
     const { spotId } = req.params;
 
-    const spot = await Spot.findByPk(spotId);
-    // console.log(spot)
-    const ownerId = spot.ownerId;
-    const owner = await User.findByPk(ownerId)
+    try {
+      // Find the spot by its ID
+      const spot = await Spot.findByPk(spotId, {
+        include: [
+          {
+            model: User,
+            attributes: ['id', 'firstName', 'lastName'],
+          },
+          {
+            model: SpotImage,
+            attributes: ['id', 'url', 'preview'],
+          },
+        ],
+      });
 
-    res.json({
-        spot,
+      if (!spot) {
+        return res.status(404).json({
+          message: 'Spot not found',
+        });
+      }
+
+      // Get the number of reviews and average star rating
+      const numReviews = await Review.count({
+        where: { spotId: spot.id },
+      });
+      const avgStarRating = await Review.findOne({
+        where: { spotId: spot.id },
+        attributes: [[Sequelize.fn('AVG', Sequelize.col('stars')), 'avgStarRating']],
+      });
+
+      // response
+      res.json({
+        id: spot.id,
+        ownerId: spot.ownerId,
+        address: spot.address,
+        city: spot.city,
+        state: spot.state,
+        country: spot.country,
+        lat: spot.lat,
+        lng: spot.lng,
+        name: spot.name,
+        description: spot.description,
+        price: spot.price,
+        createdAt: spot.createdAt,
+        updatedAt: spot.updatedAt,
+        numReviews: numReviews,
+        avgStarRating: parseFloat(avgStarRating?.dataValues.avgStarRating || 0).toFixed(2),
+        SpotImages: spot.SpotImages.map(image => ({
+          id: image.id,
+          url: image.url,
+          preview: image.preview,
+        })),
         User: {
-            id: owner.id,
-            firstName: owner.firstName,
-            lastName: owner.lastName
-        }
-    })
-
-})
+            id: spot.User.id,
+            firstName: spot.User.firstName,
+            lastName: spot.User.lastName,
+          },
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
 
 // Validation middleware for booking dates
 const validateBooking = [
@@ -131,7 +180,7 @@ const validateBooking = [
       });
     }
 
-    // Check if dates are in the past
+    // Check dates in past
     const currentDate = new Date();
     if (new Date(startDate) < currentDate || new Date(endDate) < currentDate) {
       return res.status(400).json({
@@ -206,7 +255,7 @@ router.post('/:spotId/bookings', requireAuth, validateBooking, async (req, res, 
 // GET /api/spots/:spotId/bookings - Returns all bookings for a specified spot
 router.get('/:spotId/bookings', requireAuth, async (req, res, next) => {
     const { spotId } = req.params;
-    const { user } = req; // authenticated user
+    const { user } = req;
 
     try {
       // does spot exists
@@ -223,7 +272,7 @@ router.get('/:spotId/bookings', requireAuth, async (req, res, next) => {
         include: user.id === spot.ownerId ? [{
           model: User,
           attributes: ['id', 'firstName', 'lastName'],
-        }] : [], // Include User only if the authenticated user is owner
+        }] : [], //check if user is owner
       });
 
       // Map bookings
