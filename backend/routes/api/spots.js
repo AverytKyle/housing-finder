@@ -336,7 +336,7 @@ router.get('/:spotId/bookings', requireAuth, async (req, res, next) => {
     }
   });
 
-  
+
 
   // PUT /api/spots/:spotId - Updates an existing spot
 router.put('/:spotId', requireAuth, validateSpot, async (req, res, next) => {
@@ -393,6 +393,54 @@ router.put('/:spotId', requireAuth, validateSpot, async (req, res, next) => {
       next(err);
     }
   });
+
+  // POST /api/spots/:spotId/images - Add an image to a spot by its ID
+router.post('/:spotId/images', requireAuth, async (req, res, next) => {
+  const { spotId } = req.params;
+  const { url, preview } = req.body; // image info
+  const { user } = req;
+
+  try {
+      // spotID
+      const spot = await Spot.findByPk(spotId);
+
+      // Check if exists
+      if (!spot) {
+          res.status(404);
+          return res.json({
+              message: "Spot couldn't be found",
+              statusCode: 404
+          });
+      }
+
+      // Check user is owner
+      if (spot.ownerId !== user.id) {
+          res.status(403);
+          return res.json({
+              message: 'You are not authorized to add images to this spot',
+              statusCode: 403
+          });
+      }
+
+      // new spot image for preview and more
+      const newImage = await SpotImage.create({
+          spotId: spot.id,
+          url,
+          preview // Boolean declares photo as preview or not
+      });
+
+      // Returns id, url, and preview
+      return res.json({
+          id: newImage.id,
+          url: newImage.url,
+          preview: newImage.preview
+      });
+
+  } catch (err) {
+      next(err);
+  }
+});
+
 
 
 
