@@ -2,7 +2,7 @@ const express = require('express');
 const { Op, Sequelize } = require('sequelize');
 const bcrypt = require('bcryptjs');
 //added spotimage and review
-const { Spot, Booking, User, SpotImage, Review } = require('../../db/models');
+const { Spot, Booking, User, SpotImage, Review, ReviewImage } = require('../../db/models');
 const { check, validationResult } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const { requireAuth } = require('../../utils/auth');
@@ -199,6 +199,47 @@ const validateReview = [
   },
 ];
 
+// GET /api/spots/:spotId/reviews - review for spot by ID
+router.get('/:spotId/reviews', requireAuth, async (req, res, next) => {
+  const { spotId } = req.params;
+  const { review, stars } = req.body;
+  const { user } = req;
+
+  try {
+    // Check if spot exists
+    const spot = await Spot.findByPk(spotId);
+    if (!spot) {
+      res.status(404);
+      return res.json({
+        message: "Does Not Exist",
+        statusCode: 404,
+      });
+    }
+
+    const reviews = await Review.findAll({
+      where: {
+        spotId: spotId
+      },
+      include: [
+        {
+          model: User
+        },
+        {
+          model: ReviewImage,
+          attributes: ['id', 'url']
+        }
+      ]
+    });
+
+    // Return the review
+    return res.json({
+      reviews
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // POST /api/spots/:spotId/reviews - review for spot by ID
 router.post('/:spotId/reviews', requireAuth, validateReview, async (req, res, next) => {
   const { spotId } = req.params;
@@ -231,13 +272,7 @@ router.post('/:spotId/reviews', requireAuth, validateReview, async (req, res, ne
 
     // Return the created review
     return res.json({
-      id: newReview.id,
-      userId: newReview.userId,
-      spotId: newReview.spotId,
-      review: newReview.review,
-      stars: newReview.stars,
-      createdAt: newReview.createdAt,
-      updatedAt: newReview.updatedAt,
+      newReview
     });
   } catch (err) {
     next(err);
