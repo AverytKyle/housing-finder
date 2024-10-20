@@ -154,5 +154,39 @@ router.put(
     }
   );
 
+   // DELETE /reviews/:reviewId
+router.delete('/:reviewId', requireAuth, async (req, res) => {
+    const reviewId = req.params.reviewId;
+    const userId = req.user.id;
+
+    try {
+
+      const review = await Review.findByPk(reviewId);
+
+      // check review exists
+      if (!review) {
+
+        return res.status(404).json({ message: 'Review not found' });
+      }
+
+      // match review and user
+      if (review.userId !== userId) {
+
+        return res.status(403).json({ message: 'You do not have permission to delete this review' });
+      }
+
+      //Delete the review
+      await review.destroy();
+
+      // return success message
+      return res.status(200).json({ message: 'Successfully deleted' });
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
+
 
 module.exports = router;
