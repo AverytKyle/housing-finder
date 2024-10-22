@@ -66,13 +66,12 @@ router.post('/', validateLogin,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            username: user.username,
         };
 
         await setTokenCookie(res, safeUser);
 
         return res.json({
-            user: safeUser
+            safeUser
         });
     });
 
