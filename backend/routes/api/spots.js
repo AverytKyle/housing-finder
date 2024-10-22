@@ -18,19 +18,19 @@ router.get('/', async (req, res, next) => {
         attributes: ['url']
       }
     ],
-    attributes: {
-      include: [
-        // Calculate the average star rating for each spot using a subquery
-        [
-          Sequelize.literal((
-            `(SELECT AVG(stars)
-            FROM Reviews
-            WHERE Reviews.spotId = Spot.id)`
-          )),
-          'avgStarRating'
-        ],
-      ],
-    },  
+    // attributes: {
+    //   include: [
+    //     // Calculate the average star rating for each spot using a subquery
+    //     [
+    //       Sequelize.literal((
+    //         `(SELECT AVG(stars)
+    //         FROM Reviews
+    //         WHERE Reviews.spotId = Spot.id)`
+    //       )),
+    //       'avgStarRating'
+    //     ],
+    //   ],
+    // },  
   });
 
   res.json({
@@ -122,11 +122,7 @@ router.get('/current', requireAuth, async (req, res, next) => {
         {
           model: SpotImage,
           attributes: ['id', 'url', 'preview'],
-        },
-        {
-          model: User,
-          attributes: ['id', 'firstName', 'lastName'],
-        },
+        }
       ],
     });
 
@@ -151,7 +147,7 @@ router.get('/:spotId', async (req, res, next) => {
         },
         {
           model: SpotImage,
-          attributes: ['id', 'url', 'preview'],
+          attributes: ['url', 'preview'],
         },
       ],
     });
