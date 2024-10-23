@@ -54,9 +54,7 @@ router.get('/', async (req, res, next) => {
         attributes: []
       }
     ],
-    group: ['Spot.id', 'SpotImages.id'],
-    // limit: size,
-    // offset: size * (page - 1)
+    group: ['Spot.id', 'SpotImages.id']
   });
 
   const formattedSpots = spots.map(spot => ({
@@ -239,7 +237,7 @@ router.get('/:spotId', async (req, res, next) => {
           attributes: ['id', 'firstName', 'lastName']
         }
       ],
-      group: ['Spot.id', 'SpotImages.id'],
+      group: ['Spot.id', 'SpotImages.id', 'User.id'],
     });
 
     if (!spot) {

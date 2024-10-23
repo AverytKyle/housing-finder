@@ -51,18 +51,15 @@ router.post('/:reviewId/images', requireAuth, async (req, res) => {
   const userId = req.user.id;
 
   try {
-
     const review = await Review.findByPk(reviewId);
 
     //when there is no matching review
     if (!review) {
-
       return res.status(404).json({ message: "Review couldn't be found." });
     }
 
     // make sure review and user match
     if (review.userId !== userId) {
-
       return res.status(403).json({ message: "This Review Does Not Belong to You" });
     }
 
@@ -71,7 +68,6 @@ router.post('/:reviewId/images', requireAuth, async (req, res) => {
 
     // Max 10 images
     if (imageCount >= 10) {
-
       return res.status(403).json({ message: "Maximum number of images for this resouce was reached." });
     }
 
