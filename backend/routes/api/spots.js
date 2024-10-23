@@ -12,25 +12,46 @@ const router = express.Router();
 // GET /api/spots - Retrieve all spots
 router.get('/', async (req, res, next) => {
   const spots = await Spot.findAll({
+    attributes: {
+      include: [
+        [Sequelize.fn('AVG', Sequelize.col('Reviews.stars')), 'avgRating']
+      ]
+    },
     include: [
       {
         model: SpotImage,
-        attributes: ['url', 'preview']
+        attributes: ['url'],
+        where: { preview: true },
+        required: false
       },
       {
         model: Review,
-        attributes: [[Sequelize.fn('AVG', Sequelize.col('stars')), 'avgStarRating']]
+        attributes: []
       }
     ],
+    group: ['Spot.id', 'SpotImages.id'],
   });
 
-  // const avgStarRating = await Review.findOne({
-  //   where: { spotId: spots.id },
-  //   attributes: [[Sequelize.fn('AVG', Sequelize.col('stars')), 'avgStarRating']],
-  // });
+  const formattedSpots = spots.map(spot => ({
+    id: spot.id,
+    ownerId: spot.ownerId,
+    address: spot.address,
+    city: spot.city,
+    state: spot.state,
+    country: spot.country,
+    lat: spot.lat,
+    lng: spot.lng,
+    name: spot.name,
+    description: spot.description,
+    price: spot.price,
+    createdAt: spot.createdAt,
+    updatedAt: spot.updatedAt,
+    avgRating: Number(spot.dataValues.avgRating).toFixed(1),
+    previewImage: spot.SpotImages[0]?.url || null
+  }));
 
   res.json({
-    spots
+    formattedSpots
   });
 });
 
