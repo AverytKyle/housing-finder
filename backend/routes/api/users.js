@@ -9,39 +9,31 @@ const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 
-// Sign up
-// router.post('/', async (req, res) => {
-//     const { email, password, username, firstName, lastName } = req.body;
-//     const hashedPassword = bcrypt.hashSync(password);
-//     const user = await User.create({ email, username, hashedPassword, firstName, lastName });
-
-//     const safeUser = {
-//         id: user.id,
-//         email: user.email,
-//         firstName: firstName,
-//         lastName: lastName
-//     };
-
-//     await setTokenCookie(res, safeUser);
-
-//     return res.json({
-//         safeUser
-//     });
-// });
-
 const validateSignup = [
     check('email')
         .exists({ checkFalsy: true })
         .isEmail()
         .notEmpty()
-        .withMessage('Email is required.')
-        .withMessage('Please provide a valid email.'),
+        .withMessage('Invalid email.')
+        .custom(async (email) => {
+            const existingUser = await User.findOne({ where: { email } });
+            if (existingUser) {
+              throw new Error('User with that email already exists');
+            }
+            return true;
+          }),
     check('username')
         .exists({ checkFalsy: true })
         .notEmpty()
-        .withMessage('User name is required.')
         .isLength({ min: 4 })
-        .withMessage('Please provide a username with at least 4 characters.'),
+        .withMessage('Username is required.')
+        .custom(async (username) => {
+            const existingUser = await User.findOne({ where: { username } });
+            if (existingUser) {
+              throw new Error('User with that username already exists');
+            }
+            return true;
+          }),
     check('username')
         .not()
         .isEmail()
@@ -54,10 +46,12 @@ const validateSignup = [
         .withMessage('Password must be 6 characters or more.'),
     check('firstName')
         .exists({ checkFalsy: true })
-        .notEmpty(),
+        .notEmpty()
+        .withMessage('First name is required.'),
     check('lastName')
         .exists({ checkFalsy: true })
-        .notEmpty(),
+        .notEmpty()
+        .withMessage('Last name is required.'),
     handleValidationErrors
 ];
 
@@ -69,9 +63,10 @@ router.post('/', validateSignup, async (req, res) => {
 
     const safeUser = {
         id: user.id,
-        email: user.email,
         firstName: firstName,
-        lastName: lastName
+        lastName: lastName,
+        email: user.email,
+        username: user.username
     };
 
     await setTokenCookie(res, safeUser);

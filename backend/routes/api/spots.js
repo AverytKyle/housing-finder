@@ -97,7 +97,8 @@ const validateSpot = [
   check('price')
     .exists({ checkFalsy: true })
     .notEmpty()
-    .withMessage('Price is required.'),
+    .isFloat({ min: 0 })
+    .withMessage('Price per day is required.'),
   handleValidationErrors
 ];
 
@@ -262,25 +263,12 @@ router.get('/:spotId', async (req, res, next) => {
 const validateReview = [
   check('review').exists({ checkFalsy: true }).withMessage('Review text is required.'),
   check('stars').exists({ checkFalsy: true }).isInt({ min: 1, max: 5 }).withMessage('Stars must be an integer from 1 to 5.'),
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400);
-      return res.json({
-        message: 'Validation error',
-        statusCode: 400,
-        errors: errors.array(),
-      });
-    }
-    next();
-  },
+  handleValidationErrors
 ];
 
 // GET /api/spots/:spotId/reviews - review for spot by ID
 router.get('/:spotId/reviews', requireAuth, async (req, res, next) => {
   const { spotId } = req.params;
-  const { review, stars } = req.body;
-  const { user } = req;
 
   try {
     // Check if spot exists
@@ -288,8 +276,7 @@ router.get('/:spotId/reviews', requireAuth, async (req, res, next) => {
     if (!spot) {
       res.status(404);
       return res.json({
-        message: "Does Not Exist",
-        statusCode: 404,
+        message: "Spot couldn't be found"
       });
     }
 
@@ -299,7 +286,8 @@ router.get('/:spotId/reviews', requireAuth, async (req, res, next) => {
       },
       include: [
         {
-          model: User
+          model: User,
+          attributes: [ 'id', 'firstName', 'lastName' ]
         },
         {
           model: ReviewImage,
@@ -329,18 +317,16 @@ router.post('/:spotId/reviews', requireAuth, validateReview, async (req, res, ne
     if (!spot) {
       res.status(404);
       return res.json({
-        message: "Does Not Exist",
-        statusCode: 404,
+        message: "Spot couldn't be found"
       });
     }
 
     // Check if the current user already reviewed the spot
     const existingReview = await Review.findOne({ where: { spotId, userId: user.id } });
     if (existingReview) {
-      res.status(403);
+      res.status(500);
       return res.json({
-        message: "You've already reviewed this location",
-        statusCode: 403,
+        message: "User has already has a review for this spot"
       });
     }
 
@@ -348,7 +334,7 @@ router.post('/:spotId/reviews', requireAuth, validateReview, async (req, res, ne
     const newReview = await Review.create({ userId: user.id, spotId, review, stars });
 
     // Return the created review
-    return res.json({
+    return res.status(201).json({
       newReview
     });
   } catch (err) {
@@ -606,7 +592,7 @@ router.post('/:spotId/images', requireAuth, async (req, res, next) => {
     });
 
     // Returns id, url, and preview
-    return res.json({
+    return res.status(201).json({
       id: newImage.id,
       url: newImage.url,
       preview: newImage.preview
@@ -616,9 +602,6 @@ router.post('/:spotId/images', requireAuth, async (req, res, next) => {
     next(err);
   }
 });
-
-
-
 
 // DELETE /api/spots/:spotId - Delete a spot
 router.delete('/:spotId', requireAuth, async (req, res, next) => {

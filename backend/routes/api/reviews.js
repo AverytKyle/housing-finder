@@ -28,7 +28,7 @@ router.get('/current', async (req, res, next) => {
         include: [
           {
             model: SpotImage,
-            attributes: ['preview']
+            attributes: ['url']
           }
         ]
       },
