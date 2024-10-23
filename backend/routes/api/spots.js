@@ -16,22 +16,18 @@ router.get('/', async (req, res, next) => {
       {
         model: SpotImage,
         attributes: ['url', 'preview']
+      },
+      {
+        model: Review,
+        attributes: [[Sequelize.fn('AVG', Sequelize.col('stars')), 'avgStarRating']]
       }
     ],
-    attributes: {
-      include: [
-        // Calculate the average star rating for each spot using a subquery
-        [
-          Sequelize.literal((
-            `(SELECT AVG(stars)
-            FROM Reviews
-            WHERE Reviews.spotId = Spot.id)`
-          )),
-          'avgStarRating'
-        ],
-      ],
-    },  
   });
+
+  // const avgStarRating = await Review.findOne({
+  //   where: { spotId: spots.id },
+  //   attributes: [[Sequelize.fn('AVG', Sequelize.col('stars')), 'avgStarRating']],
+  // });
 
   res.json({
     spots
