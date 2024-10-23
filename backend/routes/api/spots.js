@@ -78,17 +78,18 @@ const validateSpot = [
     .notEmpty()
     .withMessage('Latitude is required.')
     .isFloat({ min: -90, max: 90 })
-    .withMessage('Latitude must be between -90 and 90.'),
+    .withMessage('Latitude is not valid.'),
   check('lng')
     .exists({ checkFalsy: true })
     .notEmpty()
     .withMessage('Longitude is required.')
     .isFloat({ min: -180, max: 180 })
-    .withMessage('Longitude must be between -180 and 180.'),
+    .withMessage('Longitude is not valid.'),
   check('name')
     .exists({ checkFalsy: true })
     .notEmpty()
-    .withMessage('Name is required.'),
+    .isLength({ max: 50 })
+    .withMessage('Name must be less than 50 characters.'),
   check('description')
     .exists({ checkFalsy: true })
     .notEmpty()
@@ -120,7 +121,7 @@ router.post('/', requireAuth, validateSpot, async (req, res, next) => {
       price
     });
 
-    res.json(spot);
+    res.status(201).json(spot);
   } catch (err) {
     next(err);
   }
@@ -135,57 +136,27 @@ router.get('/current', requireAuth, async (req, res, next) => {
       where: {
         ownerId: user.id,
       },
+      attributes: {
+        include: [
+          [Sequelize.fn('AVG', Sequelize.col('Reviews.stars')), 'avgRating']
+        ]
+      },
       include: [
         {
           model: SpotImage,
-          attributes: ['url', 'preview'],
+          attributes: ['url'],
+          where: { preview: true },
+          required: false
+        },
+        {
+          model: Review,
+          attributes: []
         }
       ],
+      group: ['Spot.id', 'SpotImages.id'],
     });
 
-    return res.json(spots);
-  } catch (err) {
-    next(err);
-  }
-});
-
-
-// GET /api/spots/:spotId/bookings - Returns all bookings for a specified spot
-router.get('/:spotId', async (req, res, next) => {
-  const { spotId } = req.params;
-
-  try {
-    // Find the spot by its ID
-    const spot = await Spot.findByPk(spotId, {
-      include: [
-        {
-          model: User,
-          attributes: ['id', 'firstName', 'lastName'],
-        },
-        {
-          model: SpotImage,
-          attributes: ['url', 'preview'],
-        },
-      ],
-    });
-
-    if (!spot) {
-      return res.status(404).json({
-        message: 'Spot not found',
-      });
-    }
-
-    // Get the number of reviews and average star rating
-    const numReviews = await Review.count({
-      where: { spotId: spot.id },
-    });
-    const avgStarRating = await Review.findOne({
-      where: { spotId: spot.id },
-      attributes: [[Sequelize.fn('AVG', Sequelize.col('stars')), 'avgStarRating']],
-    });
-
-    // response
-    res.json({
+    const formattedSpots = spots.map(spot => ({
       id: spot.id,
       ownerId: spot.ownerId,
       address: spot.address,
@@ -199,19 +170,89 @@ router.get('/:spotId', async (req, res, next) => {
       price: spot.price,
       createdAt: spot.createdAt,
       updatedAt: spot.updatedAt,
-      numReviews: numReviews,
-      avgStarRating: parseFloat(avgStarRating?.dataValues.avgStarRating || 0).toFixed(2),
+      avgRating: Number(spot.dataValues.avgRating).toFixed(1),
+      previewImage: spot.SpotImages[0]?.url || null
+    }));
+
+    return res.json(formattedSpots);
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+// GET /api/spots/:spotId/bookings - Returns all bookings for a specified spot
+router.get('/:spotId', async (req, res, next) => {
+  const { spotId } = req.params;
+
+  try {
+    // Find the spot by its ID
+    const spot = await Spot.findByPk(spotId, {
+      attributes: {
+        include: [
+          [Sequelize.fn('AVG', Sequelize.col('Reviews.stars')), 'avgStarRating']
+        ]
+      },
+      include: [
+        {
+          model: SpotImage,
+          attributes: ['id', 'url', 'preview'],
+          where: { preview: true },
+          required: false
+        },
+        {
+          model: Review,
+          attributes: []
+        },
+        {
+          model: User,
+          attributes: ['id', 'firstName', 'lastName']
+        }
+      ],
+      group: ['Spot.id', 'SpotImages.id'],
+    });
+
+    if (!spot) {
+      return res.status(404).json({
+        message: 'Spot not found',
+      });
+    }
+
+    // Get the number of reviews and average star rating
+    const numReviews = await Review.count({
+      where: { spotId: spot.id },
+    });
+
+    const formattedSpot = {
+      id: spot.id,
+      ownerId: spot.ownerId,
+      address: spot.address,
+      city: spot.city,
+      state: spot.state,
+      country: spot.country,
+      lat: spot.lat,
+      lng: spot.lng,
+      name: spot.name,
+      description: spot.description,
+      price: spot.price,
+      createdAt: spot.createdAt,
+      updatedAt: spot.updatedAt,
+      numReviews,
+      avgStarRating: Number(spot.dataValues.avgStarRating).toFixed(1),
       SpotImages: spot.SpotImages.map(image => ({
         id: image.id,
         url: image.url,
         preview: image.preview,
       })),
-      User: {
+      Owner: {
         id: spot.User.id,
         firstName: spot.User.firstName,
         lastName: spot.User.lastName,
       },
-    });
+    }
+
+    // response
+    res.json({ formattedSpot });
   } catch (err) {
     next(err);
   }
