@@ -18,19 +18,19 @@ router.get('/', async (req, res, next) => {
         attributes: ['url', 'preview']
       }
     ],
-    // attributes: {
-    //   include: [
-    //     // Calculate the average star rating for each spot using a subquery
-    //     [
-    //       Sequelize.literal((
-    //         `(SELECT AVG(stars)
-    //         FROM Reviews
-    //         WHERE Reviews.spotId = Spot.id)`
-    //       )),
-    //       'avgStarRating'
-    //     ],
-    //   ],
-    // },  
+    attributes: {
+      include: [
+        // Calculate the average star rating for each spot using a subquery
+        [
+          Sequelize.literal((
+            `(SELECT AVG(stars)
+            FROM Reviews
+            WHERE Reviews.spotId = Spot.id)`
+          )),
+          'avgStarRating'
+        ],
+      ],
+    },  
   });
 
   res.json({
