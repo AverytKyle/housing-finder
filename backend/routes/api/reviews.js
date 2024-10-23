@@ -57,7 +57,7 @@ router.post('/:reviewId/images', requireAuth, async (req, res) => {
     //when there is no matching review
     if (!review) {
 
-      return res.status(404).json({ message: "No Matching Review Found" });
+      return res.status(404).json({ message: "Review couldn't be found." });
     }
 
     // make sure review and user match
@@ -72,7 +72,7 @@ router.post('/:reviewId/images', requireAuth, async (req, res) => {
     // Max 10 images
     if (imageCount >= 10) {
 
-      return res.status(403).json({ message: "Maximum number of images reached" });
+      return res.status(403).json({ message: "Maximum number of images for this resouce was reached." });
     }
 
     // add new image
@@ -104,11 +104,7 @@ const validateReview = [
 ]
 
 // PUT /reviews/:reviewId
-router.put(
-  '/:reviewId',
-  requireAuth,
-  validateReview,
-  async (req, res) => {
+router.put('/:reviewId', requireAuth, validateReview, async (req, res) => {
     const { review, stars } = req.body;
     const reviewId = req.params.reviewId;
     const userId = req.user.id;
@@ -145,13 +141,7 @@ router.put(
 
       // updated review data
       return res.status(200).json({
-        id: existingReview.id,
-        userId: existingReview.userId,
-        spotId: existingReview.spotId,
-        review: existingReview.review,
-        stars: existingReview.stars,
-        createdAt: existingReview.createdAt,
-        updatedAt: existingReview.updatedAt,
+        existingReview
       });
 
     } catch (error) {
@@ -172,13 +162,11 @@ router.delete('/:reviewId', requireAuth, async (req, res) => {
 
     // check review exists
     if (!review) {
-
-      return res.status(404).json({ message: 'Review not found' });
+      return res.status(404).json({ message: "Review coudln't be found" });
     }
 
     // match review and user
     if (review.userId !== userId) {
-
       return res.status(403).json({ message: 'You do not have permission to delete this review' });
     }
 

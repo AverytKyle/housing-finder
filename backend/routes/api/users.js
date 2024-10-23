@@ -18,10 +18,12 @@ const validateSignup = [
         .custom(async (email) => {
             const existingUser = await User.findOne({ where: { email } });
             if (existingUser) {
-              throw new Error('User with that email already exists');
+                const err = new Error('User with that email already exists');
+                err.status = 500;
+                throw err;
             }
             return true;
-          }),
+        }),
     check('username')
         .exists({ checkFalsy: true })
         .notEmpty()
@@ -30,10 +32,12 @@ const validateSignup = [
         .custom(async (username) => {
             const existingUser = await User.findOne({ where: { username } });
             if (existingUser) {
-              throw new Error('User with that username already exists');
+                const err = new Error('User with that username already exists');
+                err.status = 500;
+                throw err;
             }
             return true;
-          }),
+        }),
     check('username')
         .not()
         .isEmail()

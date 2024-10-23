@@ -11,7 +11,32 @@ const router = express.Router();
 
 // GET /api/spots - Retrieve all spots
 router.get('/', async (req, res, next) => {
+  let { page, size, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
+
+  page = parseInt(page);
+  size = parseInt(size);
+  minLat = parseInt(minLat);
+  maxLat = parseInt(maxLat);
+  minLng = parseInt(minLng);
+  maxLng = parseInt(maxLng);
+  minPrice = parseInt(minPrice);
+  maxPrice = parseInt(maxPrice);
+
+  if (Number.isNaN(page) || page < 0) page = 1;
+  if (Number.isNaN(size) || size < 0) size = 20;
+  if (Number.isNaN(minLat) || minLat < -90) minLat = -90;
+  if (Number.isNaN(maxLat) || maxLat > 90) maxLat = 90;
+  if (Number.isNaN(minLng) || minLng < -180) minLng = -180;
+  if (Number.isNaN(maxLng) || maxLng > 180) maxLng = 180;
+  if (Number.isNaN(minPrice) || minPrice < 0) minPrice = 0;
+  if (Number.isNaN(maxPrice) || maxPrice < 0) maxPrice = 10000000;
+
   const spots = await Spot.findAll({
+    where: {
+      lat: { [Op.between]: [minLat, maxLat] },
+      lng: { [Op.between]: [minLng, maxLng] },
+      price: { [Op.between]: [minPrice, maxPrice] }
+    },
     attributes: {
       include: [
         [Sequelize.fn('AVG', Sequelize.col('Reviews.stars')), 'avgRating']
@@ -30,6 +55,8 @@ router.get('/', async (req, res, next) => {
       }
     ],
     group: ['Spot.id', 'SpotImages.id'],
+    // limit: size,
+    // offset: size * (page - 1)
   });
 
   const formattedSpots = spots.map(spot => ({
@@ -48,10 +75,12 @@ router.get('/', async (req, res, next) => {
     updatedAt: spot.updatedAt,
     avgRating: Number(spot.dataValues.avgRating).toFixed(1),
     previewImage: spot.SpotImages[0]?.url || null
-  }));
+  })).slice(size * (page - 1), size * page);
 
   res.json({
-    formattedSpots
+    formattedSpots,
+    page,
+    size
   });
 });
 
@@ -261,8 +290,13 @@ router.get('/:spotId', async (req, res, next) => {
 
 //Validation middleware for review
 const validateReview = [
-  check('review').exists({ checkFalsy: true }).withMessage('Review text is required.'),
-  check('stars').exists({ checkFalsy: true }).isInt({ min: 1, max: 5 }).withMessage('Stars must be an integer from 1 to 5.'),
+  check('review')
+    .exists({ checkFalsy: true })
+    .withMessage('Review text is required.'),
+  check('stars')
+    .exists({ checkFalsy: true })
+    .isInt({ min: 1, max: 5 })
+    .withMessage('Stars must be an integer from 1 to 5.'),
   handleValidationErrors
 ];
 
@@ -287,7 +321,7 @@ router.get('/:spotId/reviews', requireAuth, async (req, res, next) => {
       include: [
         {
           model: User,
-          attributes: [ 'id', 'firstName', 'lastName' ]
+          attributes: ['id', 'firstName', 'lastName']
         },
         {
           model: ReviewImage,

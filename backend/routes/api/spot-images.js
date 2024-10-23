@@ -5,13 +5,13 @@ const { requireAuth } = require('../../utils/auth');
 const router = express.Router();
 
 // DELETE /spot-images/:spotId - Deletes an image for a spot
-router.delete('/:spotId', requireAuth, async (req, res, next) => {
-  const { spotId } = req.params;
+router.delete('/:imageId', requireAuth, async (req, res, next) => {
+  const { imageId } = req.params;
   const { user } = req;
 
   try {
 
-    const spotImage = await SpotImage.findByPk(spotId);
+    const spotImage = await SpotImage.findByPk(imageId);
 
     // chheck if exists
     if (!spotImage) {

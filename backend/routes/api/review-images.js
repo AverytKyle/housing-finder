@@ -10,7 +10,6 @@ router.delete('/:reviewImageId', requireAuth, async (req, res, next) => {
   const { user } = req;
 
   try {
-
     const reviewImage = await ReviewImage.findByPk(reviewImageId);
 
     // check if exists
@@ -18,12 +17,11 @@ router.delete('/:reviewImageId', requireAuth, async (req, res, next) => {
       return res.status(404).json({ message: 'Review image not found' });
     }
 
-
     const review = await Review.findByPk(reviewImage.reviewId);
 
     // match review and owner
     if (review.userId !== user.id) {
-      return res.status(403).json({ message: 'you are not authorized to delete this image' });
+      return res.status(403).json({ message: 'You are not authorized to delete this image' });
     }
 
     // Delete image
