@@ -22,9 +22,7 @@ router.get('/', restoreUser, (req, res) => {
             email: user.email,
             username: user.username
         };
-        return res.json({
-            user: safeUser
-        });
+        return res.json(safeUser);
     } else return res.json({ user: null });
 });
 
@@ -41,8 +39,7 @@ const validateLogin = [
   ];
 
 // Log in
-router.post('/', validateLogin,
-    async (req, res, next) => {
+router.post('/', validateLogin, async (req, res, next) => {
         const { credential, password } = req.body;
 
         const user = await User.unscoped().findOne({
@@ -70,9 +67,7 @@ router.post('/', validateLogin,
 
         await setTokenCookie(res, safeUser);
 
-        return res.json({
-            safeUser
-        });
+        return res.json(safeUser);
     });
 
     // Log out

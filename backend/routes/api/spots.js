@@ -82,7 +82,7 @@ router.get('/', async (req, res, next) => {
   })).slice(size * (page - 1), size * page);
 
   res.json({
-    formattedSpots,
+    Spots: formattedSpots,
     page,
     size
   });
@@ -340,7 +340,7 @@ router.get('/:spotId/reviews', requireAuth, async (req, res, next) => {
 
     // Return the review
     return res.json({
-      Reviews: reviews
+      Review: reviews
     });
   } catch (err) {
     next(err);

@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const { Op } = require('sequelize');
 
 const { setTokenCookie, requireAuth } = require('../../utils/auth');
 const { User } = require('../../db/models');
@@ -15,29 +16,11 @@ const validateSignup = [
         .isEmail()
         .notEmpty()
         .withMessage('Invalid email.'),
-        // .custom(async (email) => {
-        //     const existingUser = await User.findOne({ where: { email } });
-        //     if (existingUser) {
-        //         const err = new Error('User with that email already exists');
-        //         err.status = 500;
-        //         throw err;
-        //     }
-        //     return true;
-        // }),
     check('username')
         .exists({ checkFalsy: true })
         .notEmpty()
         .isLength({ min: 4 })
         .withMessage('Username is required.'),
-        // .custom(async (username) => {
-        //     const existingUser = await User.findOne({ where: { username } });
-        //     if (existingUser) {
-        //         const err = new Error('User with that username already exists');
-        //         err.status = 500;
-        //         throw err;
-        //     }
-        //     return true;
-        // }),
     check('username')
         .not()
         .isEmail()
@@ -59,25 +42,50 @@ const validateSignup = [
     handleValidationErrors
 ];
 
-router.post('/', validateSignup, async (req, res) => {
+router.post('/', validateSignup, async (req, res, next) => {
     const { email, password, username, firstName, lastName } = req.body;
-    const hashedPassword = bcrypt.hashSync(password);
-    //added firstname lastname
-    const user = await User.create({ email, username, firstName, lastName, hashedPassword });
+    try {
+        const existingUser = await User.findOne({
+            where: {
+                [Op.or]: [
+                    { email: email },
+                    { username: username }
+                ]
+            }
+        });
 
-    const safeUser = {
-        id: user.id,
-        firstName: firstName,
-        lastName: lastName,
-        email: user.email,
-        username: user.username
-    };
+        if (existingUser) {
+            const err = new Error('User already exists');
+            err.status = 500;  // Setting status to 500 as per test requirement
+            err.errors = {
+                email: 'User with that email already exists',
+                username: 'User with that username already exists'
+            };
+            return next(err);
+        }
 
-    await setTokenCookie(res, safeUser);
+        const hashedPassword = bcrypt.hashSync(password, 10);
+        const user = await User.create({
+            email,
+            username,
+            hashedPassword,
+            firstName,
+            lastName
+        });
+        const safeUser = {
+            id: user.id,
+            firstName: firstName,
+            lastName: lastName,
+            email: user.email,
+            username: user.username
+        };
 
-    return res.status(201).json({
-        safeUser
-    });
+        await setTokenCookie(res, safeUser);
+
+        return res.status(201).json(safeUser);
+    } catch (error) {
+        next(error);
+    }
 });
 
 module.exports = router;
