@@ -10,19 +10,19 @@ const { requireAuth } = require('../../utils/auth');
 const router = express.Router();
 
 // GET /api/spots - Retrieve all spots
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res) => {
   let { page, size, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
 
   const errors = {} //added errors
 
-  page = parseInt(page);
-  size = parseInt(size);
-  minLat = parseFloat(minLat);
-  maxLat = parseFloat(maxLat);
-  minLng = parseFloat(minLng);
-  maxLng = parseFloat(maxLng);
-  minPrice = parseFloat(minPrice);
-  maxPrice = parseFloat(maxPrice);
+  // page = parseInt(page);
+  // size = parseInt(size);
+  // minLat = parseFloat(minLat);
+  // maxLat = parseFloat(maxLat);
+  // minLng = parseFloat(minLng);
+  // maxLng = parseFloat(maxLng);
+  // minPrice = parseFloat(minPrice);
+  // maxPrice = parseFloat(maxPrice);
 
   // Validate and provide defaults
   // if (!page || page < 1 || page > 10) page = 1;
@@ -34,38 +34,65 @@ router.get('/', async (req, res, next) => {
   // if (minPrice && minPrice < 0) return res.status(400).json({ message: "Invalid minPrice" });
   // if (maxPrice && maxPrice < 0) return res.status(400).json({ message: "Invalid maxPrice" });
 
-  if (page && (isNaN(page) || page < 1)) {
-    errors.page = "Page must be greater than or equal to 1";
-  }
-  
-  if (size && (isNaN(size) || size < 1)) {
-    errors.size = "Size must be greater than or equal to 1";
-  }
-
-  // Validate latitude and longitude
-  if (minLat && (isNaN(minLat) || minLat < -90 || minLat > 90)) {
-    errors.minLat = "Minimum latitude is invalid";
-  }
-  
-  if (maxLat && (isNaN(maxLat) || maxLat < -90 || maxLat > 90)) {
-    errors.maxLat = "Maximum latitude is invalid";
-  }
-  
-  if (minLng && (isNaN(minLng) || minLng < -180 || minLng > 180)) {
-    errors.minLng = "Minimum longitude is invalid";
-  }
-  
-  if (maxLng && (isNaN(maxLng) || maxLng < -180 || maxLng > 180)) {
-    errors.maxLng = "Maximum longitude is invalid";
+  // Page validation
+  if (page !== undefined) {
+    page = parseInt(page);
+    if (Number.isNaN(page) || page < 1) {
+      errors.page = "Page must be greater than or equal to 1";
+    }
   }
 
-  // Validate price
-  if (minPrice && (isNaN(minPrice) || minPrice < 0)) {
-    errors.minPrice = "Minimum price must be greater than or equal to 0";
+  // Size validation
+  if (size !== undefined) {
+    size = parseInt(size);
+    if (Number.isNaN(size) || size < 1) {
+      errors.size = "Size must be greater than or equal to 1";
+    }
   }
-  
-  if (maxPrice && (isNaN(maxPrice) || maxPrice < 0)) {
-    errors.maxPrice = "Maximum price must be greater than or equal to 0";
+
+  // Latitude validation
+  if (minLat !== undefined) {
+    minLat = parseFloat(minLat);
+    if (Number.isNaN(minLat) || minLat < -90 || minLat > 90) {
+      errors.minLat = "Minimum latitude is invalid";
+    }
+  }
+
+  if (maxLat !== undefined) {
+    maxLat = parseFloat(maxLat);
+    if (Number.isNaN(maxLat) || maxLat < -90 || maxLat > 90) {
+      errors.maxLat = "Maximum latitude is invalid";
+    }
+  }
+
+  // Longitude validation
+  if (minLng !== undefined) {
+    minLng = parseFloat(minLng);
+    if (Number.isNaN(minLng) || minLng < -180 || minLng > 180) {
+      errors.minLng = "Minimum longitude is invalid";
+    }
+  }
+
+  if (maxLng !== undefined) {
+    maxLng = parseFloat(maxLng);
+    if (Number.isNaN(maxLng) || maxLng < -180 || maxLng > 180) {
+      errors.maxLng = "Maximum longitude is invalid";
+    }
+  }
+
+  // Price validation
+  if (minPrice !== undefined) {
+    minPrice = parseFloat(minPrice);
+    if (Number.isNaN(minPrice) || minPrice < 0) {
+      errors.minPrice = "Minimum price must be greater than or equal to 0";
+    }
+  }
+
+  if (maxPrice !== undefined) {
+    maxPrice = parseFloat(maxPrice);
+    if (Number.isNaN(maxPrice) || maxPrice < 0) {
+      errors.maxPrice = "Maximum price must be greater than or equal to 0";
+    }
   }
 
   // If there are any validation errors, return 400 response
@@ -121,10 +148,10 @@ router.get('/', async (req, res, next) => {
     state: spot.state,
     country: spot.country,
     lat: parseFloat(spot.lat),
-    lng: spot.lng,
+    lng: parseFloat(spot.lng),
     name: spot.name,
     description: spot.description,
-    price: spot.price,
+    price: parseFloat(spot.price),
     createdAt: spot.createdAt,
     updatedAt: spot.updatedAt,
     avgRating: Number(spot.dataValues.avgRating).toFixed(1),
@@ -426,9 +453,7 @@ router.post('/:spotId/reviews', requireAuth, validateReview, async (req, res, ne
     const newReview = await Review.create({ userId: user.id, spotId, review, stars });
 
     // Return the created review
-    return res.status(201).json({
-      Review: newReview
-    });
+    return res.status(201).json(newReview);
   } catch (err) {
     next(err);
   }

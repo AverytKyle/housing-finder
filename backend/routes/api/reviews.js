@@ -78,10 +78,10 @@ router.get('/current', requireAuth, async (req, res, next) => {
 });
 
 // POST /reviews/:reviewId/images
-router.post('/:reviewId/images', requireAuth, async (req, res) => {
+router.post('/:reviewId/images', requireAuth, async (req, res, next) => {
   const { url } = req.body;
-  const reviewId = req.params.reviewId;
-  const userId = req.user.id;
+  const { reviewId } = req.params;
+  const { user } = req;
 
   try {
     const review = await Review.findByPk(reviewId);
@@ -92,7 +92,7 @@ router.post('/:reviewId/images', requireAuth, async (req, res) => {
     }
 
     // make sure review and user match
-    if (review.userId !== userId) {
+    if (review.userId !== user.id) {
       return res.status(403).json({ message: "This Review Does Not Belong to You" });
     }
 
@@ -116,11 +116,8 @@ router.post('/:reviewId/images', requireAuth, async (req, res) => {
       url: newImage.url,
     });
 
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: 'Internal server error'
-    });
+  } catch (er) {
+    next(err);
   }
 });
 
@@ -137,10 +134,10 @@ const validateReview = [
 ]
 
 // PUT /reviews/:reviewId
-router.put('/:reviewId', requireAuth, validateReview, async (req, res) => {
+router.put('/:reviewId', requireAuth, validateReview, async (req, res, next) => {
   const { review, stars } = req.body;
-  const reviewId = req.params.reviewId;
-  const userId = req.user.id;
+  const { reviewId } = req.params;
+  const { user } = req;
 
   try {
     const existingReview = await Review.findByPk(reviewId);
@@ -151,7 +148,7 @@ router.put('/:reviewId', requireAuth, validateReview, async (req, res) => {
     }
 
     // match review and user
-    if (existingReview.userId !== userId) {
+    if (existingReview.userId !== user.id) {
       return res.status(403).json({ message: 'You do not have permission to edit this review' });
     }
 
@@ -169,9 +166,9 @@ router.put('/:reviewId', requireAuth, validateReview, async (req, res) => {
 });
 
 // DELETE /reviews/:reviewId
-router.delete('/:reviewId', requireAuth, async (req, res) => {
-  const reviewId = req.params.reviewId;
-  const userId = req.user.id;
+router.delete('/:reviewId', requireAuth, async (req, res, next) => {
+  const { reviewId } = req.params;
+  const { user } = req;
 
   try {
 
@@ -183,7 +180,7 @@ router.delete('/:reviewId', requireAuth, async (req, res) => {
     }
 
     // match review and user
-    if (review.userId !== userId) {
+    if (review.userId !== user.id) {
       return res.status(403).json('You do not have permission to delete this review');
     }
 
