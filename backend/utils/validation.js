@@ -9,7 +9,7 @@ const handleValidationErrors = (req, _res, next) => {
     const errors = {};
     validationErrors
       .array()
-      .forEach(error => errors[error.path] = error.msg);
+      .forEach(error => errors[error.path] = "Invalid credentials"); //changed for testing added "invalid credentials"
 
     const err = Error("Bad Request");
     err.errors = errors;

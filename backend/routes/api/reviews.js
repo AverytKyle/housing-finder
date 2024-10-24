@@ -72,7 +72,7 @@ router.get('/current', async (req, res, next) => {
   }))
 
 
-  res.json({
+  return res.json({   //added return word
     Reviews: formattedReviews
   });
 });
