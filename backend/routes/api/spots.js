@@ -15,25 +15,6 @@ router.get('/', async (req, res) => {
 
   const errors = {} //added errors
 
-  // page = parseInt(page);
-  // size = parseInt(size);
-  // minLat = parseFloat(minLat);
-  // maxLat = parseFloat(maxLat);
-  // minLng = parseFloat(minLng);
-  // maxLng = parseFloat(maxLng);
-  // minPrice = parseFloat(minPrice);
-  // maxPrice = parseFloat(maxPrice);
-
-  // Validate and provide defaults
-  // if (!page || page < 1 || page > 10) page = 1;
-  // if (!size || size < 1 || size > 20) size = 20;
-  // if (minLat && (minLat < -90 || minLat > 90)) return res.status(400).json({ message: "Invalid minLat" });
-  // if (maxLat && (maxLat < -90 || maxLat > 90)) return res.status(400).json({ message: "Invalid maxLat" });
-  // if (minLng && (minLng < -180 || minLng > 180)) return res.status(400).json({ message: "Invalid minLng" });
-  // if (maxLng && (maxLng < -180 || maxLng > 180)) return res.status(400).json({ message: "Invalid maxLng" });
-  // if (minPrice && minPrice < 0) return res.status(400).json({ message: "Invalid minPrice" });
-  // if (maxPrice && maxPrice < 0) return res.status(400).json({ message: "Invalid maxPrice" });
-
   // Page validation
   if (page !== undefined) {
     page = parseInt(page);
