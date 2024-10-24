@@ -13,6 +13,8 @@ const router = express.Router();
 router.get('/', async (req, res, next) => {
   let { page, size, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
 
+  const errors = {} //added errors
+
   page = parseInt(page);
   size = parseInt(size);
   minLat = parseFloat(minLat);
@@ -23,14 +25,62 @@ router.get('/', async (req, res, next) => {
   maxPrice = parseFloat(maxPrice);
 
   // Validate and provide defaults
-  if (!page || page < 1 || page > 10) page = 1;
-  if (!size || size < 1 || size > 20) size = 20;
-  if (minLat && (minLat < -90 || minLat > 90)) return res.status(400).json({ message: "Invalid minLat" });
-  if (maxLat && (maxLat < -90 || maxLat > 90)) return res.status(400).json({ message: "Invalid maxLat" });
-  if (minLng && (minLng < -180 || minLng > 180)) return res.status(400).json({ message: "Invalid minLng" });
-  if (maxLng && (maxLng < -180 || maxLng > 180)) return res.status(400).json({ message: "Invalid maxLng" });
-  if (minPrice && minPrice < 0) return res.status(400).json({ message: "Invalid minPrice" });
-  if (maxPrice && maxPrice < 0) return res.status(400).json({ message: "Invalid maxPrice" });
+  // if (!page || page < 1 || page > 10) page = 1;
+  // if (!size || size < 1 || size > 20) size = 20;
+  // if (minLat && (minLat < -90 || minLat > 90)) return res.status(400).json({ message: "Invalid minLat" });
+  // if (maxLat && (maxLat < -90 || maxLat > 90)) return res.status(400).json({ message: "Invalid maxLat" });
+  // if (minLng && (minLng < -180 || minLng > 180)) return res.status(400).json({ message: "Invalid minLng" });
+  // if (maxLng && (maxLng < -180 || maxLng > 180)) return res.status(400).json({ message: "Invalid maxLng" });
+  // if (minPrice && minPrice < 0) return res.status(400).json({ message: "Invalid minPrice" });
+  // if (maxPrice && maxPrice < 0) return res.status(400).json({ message: "Invalid maxPrice" });
+
+  if (page && (isNaN(page) || page < 1)) {
+    errors.page = "Page must be greater than or equal to 1";
+  }
+  
+  if (size && (isNaN(size) || size < 1)) {
+    errors.size = "Size must be greater than or equal to 1";
+  }
+
+  // Validate latitude and longitude
+  if (minLat && (isNaN(minLat) || minLat < -90 || minLat > 90)) {
+    errors.minLat = "Minimum latitude is invalid";
+  }
+  
+  if (maxLat && (isNaN(maxLat) || maxLat < -90 || maxLat > 90)) {
+    errors.maxLat = "Maximum latitude is invalid";
+  }
+  
+  if (minLng && (isNaN(minLng) || minLng < -180 || minLng > 180)) {
+    errors.minLng = "Minimum longitude is invalid";
+  }
+  
+  if (maxLng && (isNaN(maxLng) || maxLng < -180 || maxLng > 180)) {
+    errors.maxLng = "Maximum longitude is invalid";
+  }
+
+  // Validate price
+  if (minPrice && (isNaN(minPrice) || minPrice < 0)) {
+    errors.minPrice = "Minimum price must be greater than or equal to 0";
+  }
+  
+  if (maxPrice && (isNaN(maxPrice) || maxPrice < 0)) {
+    errors.maxPrice = "Maximum price must be greater than or equal to 0";
+  }
+
+  // If there are any validation errors, return 400 response
+  if (Object.keys(errors).length > 0) {
+    return res.status(400).json({
+      message: "Bad Request",
+      errors: errors
+    });
+  }
+
+  // Set defaults if not provided or invalid
+  if (!page || page < 1) page = 1;
+  if (!size || size < 1) size = 20;
+  if (page > 10) page = 10;
+  if (size > 20) size = 20;
 
   //where is able to change
   const where = {};
@@ -70,7 +120,7 @@ router.get('/', async (req, res, next) => {
     city: spot.city,
     state: spot.state,
     country: spot.country,
-    lat: spot.lat,
+    lat: parseFloat(spot.lat),
     lng: spot.lng,
     name: spot.name,
     description: spot.description,
@@ -340,7 +390,7 @@ router.get('/:spotId/reviews', requireAuth, async (req, res, next) => {
 
     // Return the review
     return res.json({
-      Review: reviews
+      Reviews: reviews
     });
   } catch (err) {
     next(err);

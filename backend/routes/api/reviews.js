@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
 
 
-const { setTokenCookie, restoreUser, requireAuth } = require('../../utils/auth');
+const { requireAuth } = require('../../utils/auth');
 const { User, Review, Spot, ReviewImage, SpotImage } = require('../../db/models');
 
 const { check, validationResult } = require('express-validator');
@@ -12,7 +12,7 @@ const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
 
 // GET /api/reviews/current - Retrieve all reviews of the current user
-router.get('/current', async (req, res, next) => {
+router.get('/current', requireAuth, async (req, res, next) => {
   const { user } = req;
   const reviews = await Review.findAll({
     where: {
@@ -130,8 +130,10 @@ const validateReview = [
     .exists({ checkFalsy: true })
     .withMessage('Review text is required'),
   check('stars')
+    .exists({ checkFalsy: true })
     .isInt({ min: 1, max: 5 })
     .withMessage('Stars must be an integer between 1 and 5'),
+  handleValidationErrors
 ]
 
 // PUT /reviews/:reviewId
@@ -161,12 +163,10 @@ router.put('/:reviewId', requireAuth, validateReview, async (req, res) => {
     // updated review data
     return res.json(existingReview);
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+  } catch (err) {
+    next(err)
   }
-}
-);
+});
 
 // DELETE /reviews/:reviewId
 router.delete('/:reviewId', requireAuth, async (req, res) => {
@@ -193,9 +193,8 @@ router.delete('/:reviewId', requireAuth, async (req, res) => {
     // return success message
     return res.status(200).json('Successfully deleted');
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+  } catch (err) {
+    next(err)
   }
 });
 
