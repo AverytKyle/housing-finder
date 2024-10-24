@@ -14,30 +14,30 @@ const validateSignup = [
         .exists({ checkFalsy: true })
         .isEmail()
         .notEmpty()
-        .withMessage('Invalid email.')
-        .custom(async (email) => {
-            const existingUser = await User.findOne({ where: { email } });
-            if (existingUser) {
-                const err = new Error('User with that email already exists');
-                err.status = 500;
-                throw err;
-            }
-            return true;
-        }),
+        .withMessage('Invalid email.'),
+        // .custom(async (email) => {
+        //     const existingUser = await User.findOne({ where: { email } });
+        //     if (existingUser) {
+        //         const err = new Error('User with that email already exists');
+        //         err.status = 500;
+        //         throw err;
+        //     }
+        //     return true;
+        // }),
     check('username')
         .exists({ checkFalsy: true })
         .notEmpty()
         .isLength({ min: 4 })
-        .withMessage('Username is required.')
-        .custom(async (username) => {
-            const existingUser = await User.findOne({ where: { username } });
-            if (existingUser) {
-                const err = new Error('User with that username already exists');
-                err.status = 500;
-                throw err;
-            }
-            return true;
-        }),
+        .withMessage('Username is required.'),
+        // .custom(async (username) => {
+        //     const existingUser = await User.findOne({ where: { username } });
+        //     if (existingUser) {
+        //         const err = new Error('User with that username already exists');
+        //         err.status = 500;
+        //         throw err;
+        //     }
+        //     return true;
+        // }),
     check('username')
         .not()
         .isEmail()
@@ -75,7 +75,7 @@ router.post('/', validateSignup, async (req, res) => {
 
     await setTokenCookie(res, safeUser);
 
-    return res.json({
+    return res.status(201).json({
         safeUser
     });
 });

@@ -43,8 +43,6 @@ router.get('/', async (req, res, next) => {
 
   const spots = await Spot.findAll({
     where,
-    limit: size,
-    offset: size * (page - 1),
     attributes: {
       include: [
         [Sequelize.fn('AVG', Sequelize.col('Reviews.stars')), 'avgRating']
@@ -81,10 +79,10 @@ router.get('/', async (req, res, next) => {
     updatedAt: spot.updatedAt,
     avgRating: Number(spot.dataValues.avgRating).toFixed(1),
     previewImage: spot.SpotImages[0]?.url || null
-  }));
+  })).slice(size * (page - 1), size * page);
 
   res.json({
-    Spots: formattedSpots,
+    formattedSpots,
     page,
     size
   });
