@@ -209,7 +209,10 @@ router.get('/current', requireAuth, async (req, res, next) => {
       previewImage: spot.SpotImages[0]?.url || null
     }));
 
-    return res.json(formattedSpots);
+    //Changed format for error matching
+    return res.json({
+      Spots: formattedSpots
+    });
   } catch (err) {
     next(err);
   }
@@ -249,7 +252,7 @@ router.get('/:spotId', async (req, res, next) => {
 
     if (!spot) {
       return res.status(404).json({
-        message: 'Spot not found',
+        message: "Spot couldn't be found",
       });
     }
 
@@ -287,7 +290,7 @@ router.get('/:spotId', async (req, res, next) => {
     }
 
     // response
-    res.json({ formattedSpot });
+    res.json(formattedSpot);
   } catch (err) {
     next(err);
   }
@@ -337,7 +340,7 @@ router.get('/:spotId/reviews', requireAuth, async (req, res, next) => {
 
     // Return the review
     return res.json({
-      reviews
+      Reviews: reviews
     });
   } catch (err) {
     next(err);
@@ -365,7 +368,7 @@ router.post('/:spotId/reviews', requireAuth, validateReview, async (req, res, ne
     if (existingReview) {
       res.status(500);
       return res.json({
-        message: "User has already has a review for this spot"
+        message: "User already has a review for this spot"
       });
     }
 
@@ -374,7 +377,7 @@ router.post('/:spotId/reviews', requireAuth, validateReview, async (req, res, ne
 
     // Return the created review
     return res.status(201).json({
-      newReview
+      Review: newReview
     });
   } catch (err) {
     next(err);
@@ -436,7 +439,7 @@ router.post('/:spotId/bookings', requireAuth, validateBooking, async (req, res, 
   try {
     const spot = await Spot.findByPk(spotId);
     if (!spot) {
-      const err = new Error('Spot not found');
+      const err = new Error("Spot couldn't be found");
       err.status = 404;
       return next(err);
     }
@@ -492,7 +495,7 @@ router.get('/:spotId/bookings', requireAuth, async (req, res, next) => {
     const spot = await Spot.findByPk(spotId);
     if (!spot) {
       return res.status(404).json({
-        message: 'Spot not found',
+        message: "Spot couldn't be found",
       });
     }
 
@@ -550,7 +553,7 @@ router.put('/:spotId', requireAuth, validateSpot, async (req, res, next) => {
     const spot = await Spot.findByPk(spotId);
     if (!spot) {
       return res.status(404).json({
-        message: 'Spot not found',
+        message: "Spot couldn't be found",
       });
     }
 
@@ -654,7 +657,7 @@ router.delete('/:spotId', requireAuth, async (req, res, next) => {
     // check if spot exists
     if (!spot) {
       return res.status(404).json({
-        message: 'Spot not found',
+        message: "Spot couldn't be found",
         statusCode: 404,
       });
     }

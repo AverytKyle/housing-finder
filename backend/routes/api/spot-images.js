@@ -15,7 +15,7 @@ router.delete('/:imageId', requireAuth, async (req, res, next) => {
 
     // chheck if exists
     if (!spotImage) {
-      return res.status(404).json({ message: 'Spot image not found' });
+      return res.status(404).json('Spot Image couldn\'t be found');
     }
 
     // Find the related spot
