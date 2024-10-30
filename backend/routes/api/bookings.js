@@ -36,11 +36,6 @@ router.get('/current', requireAuth, async (req, res, next) => {
     const formattedBookings = bookings.map(booking => ({
       id: booking.id,
       spotId: booking.spotId,
-      userId: booking.userId,
-      startDate: booking.startDate,
-      endDate: booking.endDate,
-      createdAt: booking.createdAt,
-      updatedAt: booking.updatedAt,
       Spot: {
         id: booking.Spot.id,
         ownerId: booking.Spot.ownerId,
@@ -53,7 +48,12 @@ router.get('/current', requireAuth, async (req, res, next) => {
         name: booking.Spot.name,
         price: booking.Spot.price,
         previewImage: booking.Spot.SpotImages[0]?.url || null
-      }
+      },
+      userId: booking.userId,
+      startDate: booking.startDate,
+      endDate: booking.endDate,
+      createdAt: booking.createdAt,
+      updatedAt: booking.updatedAt,
     }));
 
     return res.json({ Bookings: formattedBookings });
