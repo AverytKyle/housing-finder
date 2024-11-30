@@ -14,12 +14,17 @@
 }
 
 .profile-button {
-    width: 100%;
-    text-align: left;
+    width: 30px;
+    text-align: center;
     background: none;
     border: none;
     padding: 0;
     font-size: 25px;
     color: #333;
     cursor: pointer;
+}
+
+.profile-button:hover {
+    box-shadow: 4px 4px 4px 0 #DCDCDC;
+    border-radius: 4px;
 }

@@ -41,10 +41,10 @@ const SignupFormModal = () => {
     }
 
     return (
-        <>
-            <h1>Sign Up</h1>
-            <form onSubmit={handleSubmit}>
-                <label>
+        <div className="signup-form-modal">
+            <h1 className="signup-title">Sign Up</h1>
+            <form className="signup-form" onSubmit={handleSubmit}>
+                <label className="input-label">
                     Email
                     <input
                         type="text"
@@ -54,7 +54,7 @@ const SignupFormModal = () => {
                     />
                 </label>
                 {errors.email && <p>{errors.email}</p>}
-                <label>
+                <label className="input-label">
                     Username
                     <input
                         type="text"
@@ -64,7 +64,7 @@ const SignupFormModal = () => {
                     />
                 </label>
                 {errors.username && <p>{errors.username}</p>}
-                <label>
+                <label className="input-label">
                     First Name
                     <input
                         type="text"
@@ -74,7 +74,7 @@ const SignupFormModal = () => {
                     />
                 </label>
                 {errors.firstName && <p>{errors.firstName}</p>}
-                <label>
+                <label className="input-label">
                     Last Name
                     <input
                         type="text"
@@ -84,7 +84,7 @@ const SignupFormModal = () => {
                     />
                 </label>
                 {errors.lastName && <p>{errors.lastName}</p>}
-                <label>
+                <label className="input-label">
                     Password
                     <input
                         type="password"
@@ -94,7 +94,7 @@ const SignupFormModal = () => {
                     />
                 </label>
                 {errors.password && <p>{errors.password}</p>}
-                <label>
+                <label className="input-label">
                     Confirm Password
                     <input
                         type="password"
@@ -104,9 +104,9 @@ const SignupFormModal = () => {
                     />
                 </label>
                 {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
-                <button type="submit">Sign Up</button>
+                <button className="signup-button" type="submit">Sign Up</button>
             </form>
-        </>
+        </div>
     )
 };
 
