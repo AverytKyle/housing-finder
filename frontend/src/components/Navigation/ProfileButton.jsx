@@ -2,9 +2,10 @@ import { AiOutlineUser } from "react-icons/ai";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import * as sessionActions from '../../store/session';
-import OpenModalButton from '../OpenModalButton/OpenModalButton';
+import OpenModalMenuItem from "./OpenModalMenuItem";
 import LoginFormModal from '../LoginFormModal/LoginFormModal';
 import SignupFormModal from '../SignupFormModal/SignupFormModal';
+import './Navigation.css';
 
 const ProfileButton = ({ user }) => {
     const dispatch = useDispatch();
@@ -41,8 +42,8 @@ const ProfileButton = ({ user }) => {
 
     return (
         <>
-            <button onClick={toggleMenu}>
-                <AiOutlineUser style={{ fontSize: '15px' }} />
+            <button onClick={toggleMenu} className="profile-button">
+                <AiOutlineUser />
             </button>
             <ul className={ulClassName} ref={ulRef}>
                 {user ? (
@@ -56,17 +57,17 @@ const ProfileButton = ({ user }) => {
                     </>
                 ) : (
                     <>
-                        <li>
-                            <OpenModalButton
-                                buttonText="Log In"
-                                onButtonClick={closeMenu}
+                        <li className="login-modal">
+                            <OpenModalMenuItem 
+                                itemText="Log In"
+                                onItemClick={closeMenu}
                                 modalComponent={<LoginFormModal />}
                             />
                         </li>
-                        <li>
-                            <OpenModalButton
-                                buttonText="Sign Up"
-                                onButtonClick={closeMenu}
+                        <li className="signup-modal">
+                            <OpenModalMenuItem
+                                itemText="Sign Up"
+                                onItemlick={closeMenu}
                                 modalComponent={<SignupFormModal />}
                             />
                         </li>
