@@ -14,17 +14,17 @@ module.exports = {
     await SpotImage.bulkCreate([
       {
         spotId: 1,
-        url: 'https://example.com/condo1.jpg',
+        url: 'https://cdn.pixabay.com/photo/2016/11/18/17/46/house-1836070_1280.jpg',
         preview: true
       },
       {
         spotId: 1,
-        url: 'https://example.com/condo2.jpg',
+        url: 'https://cdn.pixabay.com/photo/2016/06/24/10/47/house-1477041_1280.jpg',
         preview: false
       },
       {
         spotId: 2,
-        url: 'https://example.com/penthouse1.jpg',
+        url: 'https://cdn.pixabay.com/photo/2013/10/09/02/27/lake-192990_1280.jpg',
         preview: true
       }
     ], { validate: true });
@@ -34,7 +34,7 @@ module.exports = {
     options.tableName = 'SpotImages';
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete({
-      url: { [Op.in]: ['https://example.com/condo1.jpg', 'https://example.com/condo2.jpg', 'https://example.com/penthouse1.jpg'] }
+      url: { [Op.in]: ['https://cdn.pixabay.com/photo/2016/11/18/17/46/house-1836070_1280.jpg', 'https://cdn.pixabay.com/photo/2016/06/24/10/47/house-1477041_1280.jpg', 'https://cdn.pixabay.com/photo/2013/10/09/02/27/lake-192990_1280.jpg'] }
     }, {});
   }
 };
