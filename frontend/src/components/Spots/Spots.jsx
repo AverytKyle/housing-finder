@@ -15,7 +15,7 @@ function Spots() {
         <div className="spots-container">
             {Object.values(spots).map(spot => (
                 <div key={spot.id} className="spot-card">
-                    <img src={spot.previewImage} alt={spot.name} />
+                    <img src={spot.imageUrl} alt={spot.name} />
                     <h3>{spot.name}</h3>
                     <p>{spot.city}, {spot.state} {spot.avgRating}</p>
                     <p>${spot.price} night</p>
