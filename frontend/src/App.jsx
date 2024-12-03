@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import Navigation from './components/Navigation';
+import Spots from './components/Spots/Spots';
 import * as sessionActions from './store/session';
 
 function Layout() {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
       {
         path: '/',
         element: <h1>Welcome!</h1>
+      },
+      {
+        path: '/spots',
+        element: <Spots />
       }
     ]
   }

@@ -28,3 +28,8 @@
     box-shadow: 4px 4px 4px 0 #DCDCDC;
     border-radius: 4px;
 }
+
+.menu-icons {
+    display: flex;
+    justify-content: space-between;
+}
