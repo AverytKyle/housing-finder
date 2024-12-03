@@ -1,0 +1,14 @@
+.spots-container {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 25px;
+}
+
+.spot-card:hover {
+    cursor: pointer;
+}
+
+.spot-card.img {
+    width: 300px;
+    height: 300px;
+}

@@ -11,7 +11,7 @@ const load = spots => ({
 });
 
 export const getSpots = () => async dispatch => {
-    const response = await csrfFetch(`/api/spots`);
+    const response = await fetch(`/api/spots`);
 
     if (response.ok) {
         const spots = await response.json();
