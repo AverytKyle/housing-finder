@@ -14,7 +14,9 @@ function SpotDetails() {
     }, [dispatch, spotId]);
 
     return (
-        <div>
+        <div className='spot-details'>
+            <h2>{spotDetails.name}</h2>
+            <h3>{spotDetails.city}, {spotDetails.state}, {spotDetails.country}</h3>
         </div>
     );
 }
