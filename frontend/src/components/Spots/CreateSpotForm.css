@@ -1,0 +1,38 @@
+.errors {
+    color: red;
+}
+
+.create-spot-form {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 600px;
+    padding: 20px;
+}
+
+.city-state {
+    display: flex;
+    text-align: left;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.create-spot-form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.create-spot-form input {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.lat-lng {
+    display: flex;
+    text-align: left;
+    justify-content: flex-start;
+    gap: 10px;
+}

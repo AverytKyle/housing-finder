@@ -1,6 +1,7 @@
 import { AiOutlineUser } from "react-icons/ai";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
+import { NavLink } from "react-router-dom";
 import * as sessionActions from '../../store/session';
 import OpenModalMenuItem from "./OpenModalMenuItem";
 import LoginFormModal from '../LoginFormModal/LoginFormModal';
@@ -47,18 +48,23 @@ const ProfileButton = ({ user }) => {
             </button>
             <ul className={ulClassName} ref={ulRef}>
                 {user ? (
-                    <>
-                        <li>{user.username}</li>
-                        <li>{user.firstName} {user.lastName}</li>
-                        <li>{user.email}</li>
-                        <li>
+                    <div>
+                        <div className="user-info">
+                            <p>Hello, {user.username}</p>
+                            <p>{user.firstName} {user.lastName}</p>
+                            <p>{user.email}</p>
+                        </div>
+                        <div className="manage-spots">
+                            <NavLink to={"/spots/current"}>Manage Spots</NavLink>
+                        </div>
+                        <div>
                             <button onClick={logout}>Log Out</button>
-                        </li>
-                    </>
+                        </div>
+                    </div>
                 ) : (
                     <>
                         <li className="login-modal">
-                            <OpenModalMenuItem 
+                            <OpenModalMenuItem
                                 itemText="Log In"
                                 onItemClick={closeMenu}
                                 modalComponent={<LoginFormModal />}
