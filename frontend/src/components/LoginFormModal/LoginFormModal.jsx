@@ -14,13 +14,17 @@ function LoginFormModal() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrors({});
-    
+
     return dispatch(sessionActions.login({ credential, password }))
-      .then(closeModal)
-      .catch(async (res) => {
-        const data = await res.json();
-        if (data && data.errors) {
-          setErrors(data.errors);
+      .then(() => {
+        closeModal();
+        window.location.href = '/';
+      })
+      .catch((error) => {
+        if (error.errors) {
+          setErrors(error.errors);
+        } else {
+          setErrors({ credential: 'Invalid credentials' });
         }
       });
   };
@@ -49,9 +53,7 @@ function LoginFormModal() {
             required
           />
         </label>
-        {errors.credential && (
-          <p className='errors'>{errors.credential}</p>
-        )}
+        {errors.credential && <p style={{ color: 'red', margin: '5px 0' }}>{errors.credential}</p>}
         <button className='login-button' type="submit">Log In</button>
       </form>
     </div>

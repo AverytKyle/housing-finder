@@ -11,11 +11,18 @@ function Navigation({ isLoaded }) {
       <div className='home-icon'>
         <NavLink to="/">Home</NavLink>
       </div>
-      {isLoaded && (
-        <div className='profile-icon'>
-          <ProfileButton user={sessionUser} />
-        </div>
-      )}
+      <div className='profile'>
+        {isLoaded && sessionUser && (
+          <div className='create-spot'>
+            <NavLink to="/spots">Create a New Spot</NavLink>
+          </div>
+        )}
+        {isLoaded && (
+          <div className='profile-icon'>
+            <ProfileButton user={sessionUser} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

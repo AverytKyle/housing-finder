@@ -25,10 +25,8 @@ export const getSpots = () => async dispatch => {
 };
 
 export const getSpotById = (id) => async dispatch => {
-    console.log('Original ID:', id);
     const spotId = parseInt(id, 10);
-    console.log('ID after parseInt:', spotId);
-    
+
     if (isNaN(spotId)) return;
     
     const response = await fetch(`/api/spots/${spotId}`);

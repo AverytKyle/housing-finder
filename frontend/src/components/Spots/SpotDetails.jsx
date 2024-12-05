@@ -17,6 +17,10 @@ function SpotDetails() {
         return <div>Loading...</div>;
     }
 
+    const handleReserveClick = () => {
+        alert('Feature Coming Soon...')
+    };
+
     return (
         <div className='spot-details'>
             <h2 className='spot-name'>{spotDetails.name}</h2>
@@ -32,10 +36,12 @@ function SpotDetails() {
                     <p className='description'>{spotDetails.description}</p>
                 </div>
                 <div key={spotDetails.id} className='price-reserve-box'>
-                    <p className='price'>${spotDetails.price} per night</p>
-                    <p className='raiting-reviews'>{spotDetails.avgStarRating} Stars - Reviews: {spotDetails.numReviews}</p>
+                    <div className='price-reviews'>
+                        <p className='price'>${spotDetails.price} per night</p>
+                        <p className='raiting-reviews'>{spotDetails.avgStarRating} Stars &#x2022; {spotDetails.numReviews} reviews</p>
+                    </div>
                     <div className='button'>
-                        <button className='reserve-button' type='submit'>Reserve</button>
+                        <button className='reserve-button' onClick={handleReserveClick} type='submit'>Reserve</button>
                     </div>
                 </div>
             </div>
