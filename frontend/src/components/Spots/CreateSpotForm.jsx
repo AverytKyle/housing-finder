@@ -61,20 +61,20 @@ const CreateSpotForm = () => {
         <div>
             <form className="create-spot-form" onSubmit={handleSubmit}>
                 <h1>Create a new Spot</h1>
-                <h2>Where's you spot located?</h2>
+                <h2>Where&apos;s you spot located?</h2>
                 <p>Guests will only get your exact address once they booked a reservation.</p>
-                <label className="country-label">
+                <label className="long-label">
                     Country {errors.country && <p className="errors">{errors.country}</p>}
-                    <input
+                    <input className="long-input"
                         type="text"
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
                         required
                     />
                 </label>
-                <label className="address-label">
+                <label className="long-label">
                     Street Address {errors.address && <p className="errors">{errors.address}</p>}
-                    <input
+                    <input className="long-input"
                         type="text"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
@@ -84,7 +84,7 @@ const CreateSpotForm = () => {
                 <div className="city-state">
                     <label className="city-label">
                         City {errors.city && <p className="errors">{errors.city}</p>}
-                        <input
+                        <input className="city-input"
                             type="text"
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
@@ -94,7 +94,7 @@ const CreateSpotForm = () => {
                     <p>,</p>
                     <label className="state-label">
                         State {errors.state && <p className="errors">{errors.state}</p>}
-                        <input
+                        <input className="state-input"
                             type="text"
                             value={state}
                             onChange={(e) => setState(e.target.value)}
@@ -103,19 +103,19 @@ const CreateSpotForm = () => {
                     </label>
                 </div>
                 <div className="lat-lng">
-                    <label className="lat-label">
+                    <label className="lat-lng-label">
                         Latitude {errors.lat && <p className="errors">{errors.lat}</p>}
-                        <input
-                            type="number"
+                        <input className="lat-lng-label"
+                            type="text"
                             value={lat}
                             onChange={(e) => setLat(e.target.value)}
                         />
                     </label>
                     <p>,</p>
-                    <label className="lng-label">
+                    <label className="lat-lng-label">
                         Longitude {errors.lng && <p className="errors">{errors.lng}</p>}
-                        <input
-                            type="number"
+                        <input className="lat-lng-label"
+                            type="text"
                             value={lng}
                             onChange={(e) => setLng(e.target.value)}
                         />
@@ -124,7 +124,7 @@ const CreateSpotForm = () => {
                 <h2>Describe your spot to guests</h2>
                 <p>Mention the best features of your space, any special amentities like fast wifi or parking, and what you love about the neighborhood.</p>
                 <label className="description-label">
-                    <input className="description-input-box"
+                    <textarea className="description-input-box"
                         type="text"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
@@ -133,9 +133,9 @@ const CreateSpotForm = () => {
                 </label>
                 {errors.description && <p className="errors">{errors.description}</p>}
                 <h2>Create a title for your spot</h2>
-                <p>Catch guests' attention with a spot that highlights what makes your place special.</p>
+                <p>Catch guests&apos; attention with a spot that highlights what makes your place special.</p>
                 <label className="name-label">
-                    <input
+                    <input className="name-label"
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -146,12 +146,15 @@ const CreateSpotForm = () => {
                 <h2>Set a base price for your spot</h2>
                 <p>Competative pricing can help your listing stand out and rank higher in search results.</p>
                 <label className="price-label">
-                    <input className="description-input-box"
-                        type="number"
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
-                        required
-                    />
+                    <div className="price">
+                        <span className="dollar-sign">$</span>
+                        <input className="description-input-box"
+                            type="text"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            required
+                        />
+                    </div>
                 </label>
                 {errors.price && <p className="errors">{errors.price}</p>}
                 <button className="create-spot-button">Create Spot</button>
