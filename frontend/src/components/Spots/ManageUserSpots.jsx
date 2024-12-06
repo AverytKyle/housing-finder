@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import * as spotActions from '../../store/spots';
+import { useNavigate } from "react-router-dom";
 
 const ManageUserSpots = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const spots = useSelector(state => Object.values(state.spots.allSpots));
 
     useEffect(() => {
@@ -23,7 +24,7 @@ const ManageUserSpots = () => {
                         <p>{spot.city}, {spot.state} {spot.avgRating}</p>
                         <p>${spot.price} night</p>
                         <div className="button-container">
-                            <button className="update">Update</button>
+                            <button className="update" onClick={() => navigate(`/spots/${spot.id}/edit`)}>Update</button>
                             <button className="delete">Delete</button>
                         </div>
                     </div>

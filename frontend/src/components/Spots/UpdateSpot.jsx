@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as sessionActions from '../../store/session';
 import * as spotActions from '../../store/spots';
-import './CreateSpotForm.css';
 
-const CreateSpotForm = () => {
+const UpdateSpot = () => {
     const dispatch = useDispatch();
-    const sessionUser = useSelector((state) => state.session.user);
+    const { spotId } = useParams();
+    const spot = useSelector(state => state.spots.singleSpot);
     const navigate = useNavigate();
     const [country, setCountry] = useState("");
     const [address, setAddress] = useState("");
@@ -40,7 +40,7 @@ const CreateSpotForm = () => {
             return;
         }
 
-        return dispatch(spotActions.createSpot({
+        const updatedSpot = {
             address,
             city,
             state,
@@ -51,21 +51,42 @@ const CreateSpotForm = () => {
             description,
             price,
             imageUrl
-        })).then(() => {
-            navigate(`/`);
-        })
-            .catch(async (res) => {
-                const data = await res.json();
-                if (data?.errors) {
-                    setErrors(data.errors);
-                }
+        };
+
+        return dispatch(spotActions.updateSpot(spotId, updatedSpot))
+            .then(() => {
+                navigate(`/spots/${spotId}`);
             })
+            .catch((res) => {
+                if (res && res.errors) {
+                    setErrors(res.errors);
+                }
+            });
     }
+
+    useEffect(() => {
+        dispatch(spotActions.getSpotById(spotId));
+    }, [dispatch, spotId]);
+
+    useEffect(() => {
+        if (spot) {
+            setCountry(spot.country || "");
+            setAddress(spot.address || "");
+            setCity(spot.city || "");
+            setState(spot.state || "");
+            setLat(spot.lat || "");
+            setLng(spot.lng || "");
+            setDescription(spot.description || "");
+            setPrice(spot.price || "");
+            setName(spot.name || "");
+            setImageUrl(spot.SpotImages?.[0]?.url || "");
+        }
+    }, [spot]);
 
     return (
         <div>
             <form className="create-spot-form" onSubmit={handleSubmit}>
-                <h1>Create a new Spot</h1>
+                <h1>Update Your Spot</h1>
                 <h2>Where&apos;s your spot located?</h2>
                 <p>Guests will only get your exact address once they booked a reservation.</p>
                 <label className="long-label">
@@ -171,10 +192,10 @@ const CreateSpotForm = () => {
                         required
                     />
                 </label>
-                <button className="create-spot-button">Create Spot</button>
+                <button className="create-spot-button">Update Spot</button>
             </form>
         </div>
     )
 }
 
-export default CreateSpotForm;
+export default UpdateSpot;

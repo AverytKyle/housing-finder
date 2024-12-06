@@ -277,7 +277,7 @@ router.get('/current', requireAuth, async (req, res, next) => {
 });
 
 
-// GET /api/spots/:spotId/bookings - Returns all bookings for a specified spot
+// GET /api/spots/:spotId - Returns spot with the specified id
 router.get('/:spotId', async (req, res, next) => {
   const { spotId } = req.params;
 
