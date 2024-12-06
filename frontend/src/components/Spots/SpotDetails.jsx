@@ -1,16 +1,18 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getSpotById } from '../../store/spots';
+import { getSpotById, getReviewsById } from '../../store/spots';
 import './SpotDetails.css';
 
 function SpotDetails() {
     const { spotId } = useParams();
     const dispatch = useDispatch();
     const spotDetails = useSelector(state => state.spots.singleSpot);
+    const reviewDetails = useSelector(state => state.spots.allReviews)
 
     useEffect(() => {
         dispatch(getSpotById(spotId));
+        dispatch(getReviewsById(spotId));
     }, [dispatch, spotId]);
 
     if (!spotDetails || !spotDetails.SpotImages) {
@@ -22,7 +24,7 @@ function SpotDetails() {
     };
 
     return (
-        <div className='spot-details'>
+        <div className='spot-details-reviews'>
             <h2 className='spot-name'>{spotDetails.name}</h2>
             <h3 className='location'>{spotDetails.city}, {spotDetails.state}, {spotDetails.country}</h3>
             {spotDetails.SpotImages.map(image => (
@@ -44,6 +46,16 @@ function SpotDetails() {
                         <button className='reserve-button' onClick={handleReserveClick} type='submit'>Reserve</button>
                     </div>
                 </div>
+            </div>
+            <div className='review-container'>
+                <h2>{spotDetails.avgStarRating} Stars &#x2022; {spotDetails.numReviews} reviews</h2>
+                {reviewDetails && reviewDetails.map(review => (
+                    <div key={review.id} className='review-item'>
+                        <h3>{review.User.firstName}</h3>
+                        <p>{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+                        <p>{review.review}</p>
+                    </div>
+                ))}
             </div>
         </div >
     );

@@ -49,12 +49,13 @@ const CreateSpotForm = () => {
             name,
             description,
             price
-        })).catch(async (res) => {
-            const data = await res.json();
-            if (data?.errors) {
-                setErrors(data.errors);
-            }
-        })
+        })).then(window.location.href = '/')
+            .catch(async (res) => {
+                const data = await res.json();
+                if (data?.errors) {
+                    setErrors(data.errors);
+                }
+            })
     }
 
     return (
@@ -91,7 +92,6 @@ const CreateSpotForm = () => {
                             required
                         />
                     </label>
-                    <p>,</p>
                     <label className="state-label">
                         State {errors.state && <p className="errors">{errors.state}</p>}
                         <input className="state-input"
@@ -111,7 +111,6 @@ const CreateSpotForm = () => {
                             onChange={(e) => setLat(e.target.value)}
                         />
                     </label>
-                    <p>,</p>
                     <label className="lat-lng-label">
                         Longitude {errors.lng && <p className="errors">{errors.lng}</p>}
                         <input className="lat-lng-label"

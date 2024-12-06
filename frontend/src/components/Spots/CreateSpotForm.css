@@ -69,7 +69,7 @@
     font-size: 30pt;
 }
 
-.create-spot-form p {
+.create-spot-form p:not(.errors) {
     font-size: 15pt;
     margin: 0;
     margin-bottom: 10px;
