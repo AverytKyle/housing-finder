@@ -20,12 +20,12 @@ if (import.meta.env.MODE !== 'production') {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <ModalProvider>
       <Provider store={store}>
         <App />
         <Modal />
       </Provider>
     </ModalProvider>
-  </React.StrictMode>
+  // </React.StrictMode>
 );

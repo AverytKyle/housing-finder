@@ -6,6 +6,7 @@ import * as sessionActions from '../../store/session';
 import OpenModalMenuItem from "./OpenModalMenuItem";
 import LoginFormModal from '../LoginFormModal/LoginFormModal';
 import SignupFormModal from '../SignupFormModal/SignupFormModal';
+import * as spotActions from '../../store/spots';
 import './Navigation.css';
 
 const ProfileButton = ({ user }) => {
@@ -39,6 +40,11 @@ const ProfileButton = ({ user }) => {
 
     const closeMenu = () => setShowMenu(false);
 
+    const handleManageSpots = () => {
+        dispatch(spotActions.getCurrentUserSpots());
+        closeMenu();
+    };
+
     const ulClassName = "profile-dropdown" + (showMenu ? "" : " hidden");
 
     return (
@@ -55,7 +61,7 @@ const ProfileButton = ({ user }) => {
                             <p>{user.email}</p>
                         </div>
                         <div className="manage-spots">
-                            <NavLink to={"/spots/current"}>Manage Spots</NavLink>
+                            <NavLink to={"/spots/current"} onClick={handleManageSpots}>Manage Spots</NavLink>
                         </div>
                         <div>
                             <button onClick={logout}>Log Out</button>

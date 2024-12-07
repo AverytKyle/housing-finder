@@ -5,8 +5,6 @@ import { csrfFetch } from "./csrf";
 const LOAD = 'spots/LOAD';
 const LOAD_BY_ID = 'spots/LOAD_BY_ID';
 const CREATE_SPOT = 'spots/CREATE_SPOT';
-const REVIEWS_BY_ID = 'spots/REVIEWS_BY_ID';
-const LOAD_USER_SPOTS = 'spots/LOAD_USER_SPOTS';
 const UPDATE_SPOT = 'spots/UPDATE_SPOT';
 
 
@@ -25,16 +23,6 @@ const addNewSpot = (spot) => ({
     payload: spot
 })
 
-const loagReviewsById = reviews => ({
-    type: REVIEWS_BY_ID,
-    reviews
-});
-
-const loadUserSpots = spots => ({
-    type: LOAD_USER_SPOTS,
-    spots
-});
-
 const update = (spot) => ({
     type: UPDATE_SPOT,
     payload: spot
@@ -46,6 +34,7 @@ export const getSpots = () => async dispatch => {
     if (response.ok) {
         const spots = await response.json();
         dispatch(load(spots));
+        return spots;
     }
 };
 
@@ -110,21 +99,12 @@ export const createSpot = (spot) => async dispatch => {
     return response;
 }
 
-export const getReviewsById = (spotId) => async dispatch => {
-    const response = await fetch(`/api/spots/${spotId}/reviews`);
-
-    if (response.ok) {
-        const reviews = await response.json();
-        dispatch(loagReviewsById(reviews));
-    }
-}
-
 export const getCurrentUserSpots = () => async dispatch => {
     const response = await csrfFetch('/api/spots/current');
 
     if (response.ok) {
         const spots = await response.json();
-        dispatch(loadUserSpots(spots));
+        dispatch(load(spots));
         return spots;
     }
 };
@@ -172,50 +152,32 @@ export const updateSpot = (spotId, spot) => async dispatch => {
         });
     }
 
-    dispatch(updateExistingSpot(data));
+    dispatch(update(data));
     return response;
 }
 
 const initialState = {
     allSpots: {},
-    singleSpot: {},
-    allReviews: []
 }
 
 const spotsReducer = (state = initialState, action) => {
     switch (action.type) {
         case LOAD: {
             const newState = { ...state };
+            newState.allSpots = {};
             const spotsArray = action.spots.Spots;
             spotsArray.forEach(spot => {
-                newState.allSpots[spot.id] = spot;
+              newState.allSpots[spot.id] = spot;
             });
             return newState;
         }
         case LOAD_BY_ID: {
             const newState = { ...state };
-            newState.singleSpot = { ...action.spot };
-            return newState;
-        }
-        case REVIEWS_BY_ID: {
-            const newState = { ...state };
-            const reviewsArray = action.reviews.Reviews;
-            reviewsArray.forEach(review => {
-                newState.allReviews[review.id] = review;
-            });
-            return newState
-        }
-        case LOAD_USER_SPOTS: {
-            const newState = { ...state };
-            const spotsArray = action.spots.Spots;
-            spotsArray.forEach(spot => {
-                newState.allSpots[spot.id] = spot;
-            });
+            newState.allSpots = { ...action.spot };
             return newState;
         }
         case UPDATE_SPOT: {
             const newState = { ...state };
-            newState.singleSpot = action.payload;
             newState.allSpots[action.payload.id] = action.payload;
             return newState;
         }

@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import * as sessionActions from '../../store/session';
 import * as spotActions from '../../store/spots';
 import './CreateSpotForm.css';
 
 const CreateSpotForm = () => {
     const dispatch = useDispatch();
-    const sessionUser = useSelector((state) => state.session.user);
     const navigate = useNavigate();
     const [country, setCountry] = useState("");
     const [address, setAddress] = useState("");

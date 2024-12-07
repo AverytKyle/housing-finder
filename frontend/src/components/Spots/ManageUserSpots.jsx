@@ -12,6 +12,10 @@ const ManageUserSpots = () => {
         dispatch(spotActions.getCurrentUserSpots());
     }, [dispatch])
 
+    if (!spots) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <div>
             <h2> Manage Your Spots</h2>
