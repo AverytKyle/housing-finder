@@ -1,15 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSpotById } from '../../store/spots';
 import { getReviewsBySpotId } from '../../store/reviews';
 import './SpotDetails.css';
+import CreateReviewModal from '../Reviews/CreateReviewModal';
+import OpenModalMenuItem from '../Navigation/OpenModalMenuItem';
 
 function SpotDetails() {
     const { spotId } = useParams();
     const dispatch = useDispatch();
     const spotDetails = useSelector(state => state.spots.allSpots);
     const reviewDetails = useSelector(state => state.reviews.reviews)
+    const sessionUser = useSelector((state) => state.session.user);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         dispatch(getSpotById(spotId));
@@ -23,6 +27,10 @@ function SpotDetails() {
     const handleReserveClick = () => {
         alert('Feature Coming Soon...')
     };
+
+    const handleReviewClick = () => {
+
+    }
 
     return (
         <div className='spot-details-reviews'>
@@ -50,8 +58,17 @@ function SpotDetails() {
             </div>
             <div className='review-container'>
                 <h2>{spotDetails.avgStarRating} Stars &#x2022; {spotDetails.numReviews} reviews</h2>
-                {Object.values(reviewDetails) && Object.values(reviewDetails).map(review => (
-                    <div key={review.id} className='review-item'>
+                {sessionUser &&
+                    (sessionUser.id !== spotDetails.Owner.id && reviewDetails.userId !== sessionUser.id) &&
+                    <button className='create-review-button' onClick={handleReviewClick}>
+                        <OpenModalMenuItem
+                            itemText="Post a Review"
+                            onItemClick={() => setShowModal(true)}
+                            modalComponent={<CreateReviewModal spotId={spotId}/>}
+                        />
+                    </button>}
+                {Object.values(reviewDetails) && Object.values(reviewDetails).map((review, index) => (
+                    <div key={index} className='review-item'>
                         <h3>{review.User.firstName}</h3>
                         <p>{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
                         <p>{review.review}</p>

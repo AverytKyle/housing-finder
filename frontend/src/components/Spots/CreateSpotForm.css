@@ -106,3 +106,7 @@
 .price {
     display: flex;
 }
+
+.image-label {
+    width: 100%;
+}

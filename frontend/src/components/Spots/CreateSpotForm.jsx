@@ -16,10 +16,10 @@ const CreateSpotForm = () => {
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [name, setName] = useState("");
-    const [imageUrl, setImageUrl] = useState("");
+    // const [imageUrls, setImageUrls] = useState(['', '', '', '', '']);
     const [errors, setErrors] = useState("");
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setErrors({});
 
@@ -38,26 +38,24 @@ const CreateSpotForm = () => {
             return;
         }
 
-        return dispatch(spotActions.createSpot({
-            address,
-            city,
-            state,
-            country,
-            lat,
-            lng,
-            name,
-            description,
-            price,
-            imageUrl
-        })).then(() => {
+        try {
+            const response = await dispatch(spotActions.createSpot({
+                address,
+                city,
+                state,
+                country,
+                lat,
+                lng,
+                name,
+                description,
+                price,
+                // imageUrls
+            }));
             navigate(`/`);
-        })
-            .catch(async (res) => {
-                const data = await res.json();
-                if (data?.errors) {
-                    setErrors(data.errors);
-                }
-            })
+        } catch (error) {
+            console.error(error);
+            // You can display an error message to the user here
+        }
     }
 
     return (
@@ -160,15 +158,20 @@ const CreateSpotForm = () => {
                 {errors.price && <p className="errors">{errors.price}</p>}
                 <h2>Add a photo for your spot</h2>
                 <p>Submit a link to at least one photo to publish your spot.</p>
-                <label className="image-label">
-                    <input
-                        type="text"
-                        value={imageUrl}
-                        onChange={(e) => setImageUrl(e.target.value)}
-                        placeholder="Image URL"
-                        required
-                    />
-                </label>
+                {/* {imageUrls.map((url, index) => (
+                    <label key={index} className="image-label">
+                        <input
+                            type="text"
+                            value={url}
+                            onChange={(e) => {
+                                const newUrls = [...imageUrls];
+                                newUrls[index] = e.target.value;
+                                setImageUrls(newUrls);
+                            }}
+                            placeholder="Image URL"
+                        />
+                    </label>
+                ))} */}
                 <button className="create-spot-button">Create Spot</button>
             </form>
         </div>

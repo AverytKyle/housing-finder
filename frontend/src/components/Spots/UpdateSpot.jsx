@@ -6,7 +6,7 @@ import * as spotActions from '../../store/spots';
 const UpdateSpot = () => {
     const dispatch = useDispatch();
     const { spotId } = useParams();
-    const spot = useSelector(state => state.spots.singleSpot);
+    const spot = useSelector(state => state.spots.allSpots);
     const navigate = useNavigate();
     const [country, setCountry] = useState("");
     const [address, setAddress] = useState("");
@@ -17,7 +17,7 @@ const UpdateSpot = () => {
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [name, setName] = useState("");
-    const [imageUrl, setImageUrl] = useState("");
+    // const [imageUrls, setImageUrls] = useState(['', '', '', '', '']);
     const [errors, setErrors] = useState("");
 
     const handleSubmit = (e) => {
@@ -49,7 +49,7 @@ const UpdateSpot = () => {
             name,
             description,
             price,
-            imageUrl
+            // imageUrls
         };
 
         return dispatch(spotActions.updateSpot(spotId, updatedSpot))
@@ -67,18 +67,22 @@ const UpdateSpot = () => {
         dispatch(spotActions.getSpotById(spotId));
     }, [dispatch, spotId]);
 
+    if (!spot) {
+        return <div>Loading...</div>;
+    }
+
     useEffect(() => {
-        if (spot) {
-            setCountry(spot.country || "");
-            setAddress(spot.address || "");
-            setCity(spot.city || "");
-            setState(spot.state || "");
-            setLat(spot.lat || "");
-            setLng(spot.lng || "");
-            setDescription(spot.description || "");
-            setPrice(spot.price || "");
-            setName(spot.name || "");
-            setImageUrl(spot.SpotImages?.[0]?.url || "");
+        if (spot && Object.keys(spot).length > 0) {
+            setCountry(spot.country);
+            setAddress(spot.address);
+            setCity(spot.city);
+            setState(spot.state);
+            setLat(spot.lat);
+            setLng(spot.lng);
+            setDescription(spot.description);
+            setPrice(spot.price);
+            setName(spot.name);
+            // setImageUrls(spot.SpotImages.map(image => image.url));
         }
     }, [spot]);
 
@@ -182,15 +186,20 @@ const UpdateSpot = () => {
                 {errors.price && <p className="errors">{errors.price}</p>}
                 <h2>Add a photo for your spot</h2>
                 <p>Submit a link to at least one photo to publish your spot.</p>
-                <label className="image-label">
-                    <input
-                        type="text"
-                        value={imageUrl}
-                        onChange={(e) => setImageUrl(e.target.value)}
-                        placeholder="Image URL"
-                        required
-                    />
-                </label>
+                {/* {imageUrls.map((url, index) => (
+                    <label key={index} className="image-label">
+                        <input
+                            type="text"
+                            value={url}
+                            onChange={(e) => {
+                                const newUrls = [...imageUrls];
+                                newUrls[index] = e.target.value;
+                                setImageUrls(newUrls);
+                            }}
+                            placeholder="Image URL"
+                        />
+                    </label>
+                ))} */}
                 <button className="create-spot-button">Update Spot</button>
             </form>
         </div>

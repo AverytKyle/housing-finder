@@ -6,6 +6,7 @@ const LOAD = 'spots/LOAD';
 const LOAD_BY_ID = 'spots/LOAD_BY_ID';
 const CREATE_SPOT = 'spots/CREATE_SPOT';
 const UPDATE_SPOT = 'spots/UPDATE_SPOT';
+const REMOVE_SPOT = 'spots/REMOVE_SPOT';
 
 
 const load = spots => ({
@@ -27,6 +28,11 @@ const update = (spot) => ({
     type: UPDATE_SPOT,
     payload: spot
 });
+
+const removeSpot = (spotId) => ({
+    type: REMOVE_SPOT,
+    spotId
+})
 
 export const getSpots = () => async dispatch => {
     const response = await fetch(`/api/spots`);
@@ -53,6 +59,7 @@ export const getSpotById = (id) => async dispatch => {
 }
 
 export const createSpot = (spot) => async dispatch => {
+    console.log('createSpot function called');
     const {
         address,
         city,
@@ -63,7 +70,7 @@ export const createSpot = (spot) => async dispatch => {
         name,
         description,
         price,
-        imageUrl
+        imageUrls
     } = spot;
 
     //First create the spot
@@ -83,16 +90,23 @@ export const createSpot = (spot) => async dispatch => {
     });
 
     const data = await response.json();
+
+    if (!data.spot) {
+        console.error('Error creating spot:', data);
+        return;
+    }
     
     // Then add the image to the spot
-    if (imageUrl) {
-        await csrfFetch(`/api/spots/${data.spot.id}/images`, {
-            method: 'POST',
-            body: JSON.stringify({
-                url: imageUrl,
-                preview: true
-            })
-        });
+    if (imageUrls.length > 0) {
+        await Promise.all(imageUrls.map(async imageUrl => {
+            await csrfFetch(`/api/spots/${data.spot.id}/images`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    url: imageUrl,
+                    preview: true
+                })
+            });
+        }));
     }
 
     dispatch(addNewSpot(data.spot));
@@ -156,6 +170,14 @@ export const updateSpot = (spotId, spot) => async dispatch => {
     return response;
 }
 
+export const deleteSpot = (spotId) => async dispatch => {
+    const response = await csrfFetch(`/api/spots/${spotId}`, {
+        method: 'DELETE'
+    });
+    dispatch(removeSpot(spotId));
+    return response;
+}
+
 const initialState = {
     allSpots: {},
 }
@@ -179,6 +201,11 @@ const spotsReducer = (state = initialState, action) => {
         case UPDATE_SPOT: {
             const newState = { ...state };
             newState.allSpots[action.payload.id] = action.payload;
+            return newState;
+        }
+        case REMOVE_SPOT: {
+            const newState = { ...state };
+            delete newState.allSpots[action.spotId];
             return newState;
         }
         default:
