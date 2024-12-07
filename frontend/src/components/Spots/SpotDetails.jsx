@@ -6,6 +6,7 @@ import { getReviewsBySpotId } from '../../store/reviews';
 import './SpotDetails.css';
 import CreateReviewModal from '../Reviews/CreateReviewModal';
 import OpenModalMenuItem from '../Navigation/OpenModalMenuItem';
+import DeleteReviewModal from '../Reviews/DeleteReviewModal';
 
 function SpotDetails() {
     const { spotId } = useParams();
@@ -28,10 +29,6 @@ function SpotDetails() {
         alert('Feature Coming Soon...')
     };
 
-    const handleReviewClick = () => {
-
-    }
-
     return (
         <div className='spot-details-reviews'>
             <h2 className='spot-name'>{spotDetails.name}</h2>
@@ -43,7 +40,7 @@ function SpotDetails() {
             ))}
             <div className='descrip-price'>
                 <div>
-                    <h2 className='owner-name'>Hosted by {spotDetails.Owner.firstName} {spotDetails.Owner.lastName}</h2>
+                    <h2 className='owner-name'>Hosted by {spotDetails.Owner?.firstName} {spotDetails.Owner?.lastName}</h2>
                     <p className='description'>{spotDetails.description}</p>
                 </div>
                 <div key={spotDetails.id} className='price-reserve-box'>
@@ -60,18 +57,25 @@ function SpotDetails() {
                 <h2>{spotDetails.avgStarRating} Stars &#x2022; {spotDetails.numReviews} reviews</h2>
                 {sessionUser &&
                     (sessionUser.id !== spotDetails.Owner.id && reviewDetails.userId !== sessionUser.id) &&
-                    <button className='create-review-button' onClick={handleReviewClick}>
+                    <button className='create-review-button'>
                         <OpenModalMenuItem
                             itemText="Post a Review"
                             onItemClick={() => setShowModal(true)}
-                            modalComponent={<CreateReviewModal spotId={spotId}/>}
+                            modalComponent={<CreateReviewModal spotId={spotId} />}
                         />
                     </button>}
                 {Object.values(reviewDetails) && Object.values(reviewDetails).map((review, index) => (
                     <div key={index} className='review-item'>
-                        <h3>{review.User.firstName}</h3>
+                        <h3>{review.User?.firstName}</h3>
                         <p>{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
                         <p>{review.review}</p>
+                        <button className='delete-button'>
+                            <OpenModalMenuItem
+                                itemText="Delete"
+                                onItemClick={() => setShowModal(true)}
+                                modalComponent={<DeleteReviewModal reviewId={review.id} spotId={spotDetails.id} />}
+                            />
+                        </button>
                     </div>
                 ))}
             </div>
