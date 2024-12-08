@@ -18,7 +18,7 @@
     text-align: left;
     justify-content: flex-start;
     gap: 10px;
-    width: 100%;
+    width: 97%;
 }
 
 .create-spot-form label {
@@ -36,26 +36,26 @@
     text-align: left;
     justify-content: flex-start;
     gap: 10px;
-    width: 100%;
+    width: 97%;
 }
 
 .description-input-box, .description-label {
-    width: 100%;
+    width: 98%;
     height: 100px;
     resize: none;
     font-size: 12pt;
 }
 
 .long-label, .long-input, .lat-lng-label {
-    width: 100%;
+    width: 97%;
 }
 
 .city-label, .city-input {
-    width: 175%;
+    width: 150%;
 }
 
 .state-label, .state-input {
-    width: 100%;
+    width: 98%;
 }
 
 .create-spot-form h2 {
@@ -90,7 +90,7 @@
 }
 
 .name-label {
-    width: 100%;
+    width: 97%;
 }
 
 .price-label {
@@ -108,5 +108,9 @@
 }
 
 .image-label {
-    width: 100%;
+    width:97%;
+}
+
+.line {
+    border-top: 2px solid black;
 }

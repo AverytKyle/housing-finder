@@ -6,6 +6,7 @@ import { faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import * as reviewActions from '../../store/reviews';
 import * as spotActions from '../../store/spots';
+import './CreateReviewModal.css';
 
 function CreateReviewModal({ spotId }) {
     const sessionUser = useSelector((state) => state.session.user);
@@ -31,7 +32,14 @@ function CreateReviewModal({ spotId }) {
             .then(() => {
                 closeModal();
                 dispatch(spotActions.getSpotById(spotId));
-            });
+            })
+            .catch((error) => {
+                if (error.errors) {
+                  setErrors(error.errors);
+                } else {
+                  setErrors({ review: 'Review already exists for this spot' });
+                }
+              });
     };
 
     const handleStarMouseEnter = (star) => {
@@ -47,9 +55,10 @@ function CreateReviewModal({ spotId }) {
     };
 
     return (
-        <div className='creatreview-modal'>
+        <div className='create-review-modal'>
             <h1 className='title'>How was your stay?</h1>
-            <form className='modal container'>
+            <form className='review-form'>
+                {errors.review && <p className="errors" style={{ color: 'red', margin: '5px 0' }}>{errors.review}</p>}
                 <label>
                     <textarea
                         className='modal-textarea'
@@ -67,10 +76,11 @@ function CreateReviewModal({ spotId }) {
                             onMouseEnter={() => handleStarMouseEnter(star)}
                             onMouseLeave={handleStarMouseLeave}
                             className={(star <= stars || star <= hoveredStar) ? 'star-hover' : ''}
+                            required
                         />
                     ))}
                 </div>
-                <button type="submit" disabled={review.length < 10} onClick={handleSubmit}>Submit Your Review</button>
+                <button className='submit-button' type="submit" disabled={review.length < 10} onClick={handleSubmit}>Submit Your Review</button>
             </form>
         </div>
     );

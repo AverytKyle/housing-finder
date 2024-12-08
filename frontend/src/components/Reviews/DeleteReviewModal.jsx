@@ -3,12 +3,13 @@ import { useModal } from '../../context/Modal';
 import { deleteReview } from '../../store/reviews';
 import { getReviewsBySpotId } from '../../store/reviews';
 import { getSpotById } from '../../store/spots';
+import './DeleteReviewModal.css';
 
 function DeleteReviewModal({ reviewId, spotId }) {
     const dispatch = useDispatch();
     const { closeModal } = useModal();
 
-    const handleclick = (e) => {
+    const handleclick = () => {
         dispatch(deleteReview(reviewId))
         .then(() => {
             dispatch(getReviewsBySpotId(spotId));
@@ -17,7 +18,7 @@ function DeleteReviewModal({ reviewId, spotId }) {
         });
     };
 
-    const handleCancel = (e) => {
+    const handleCancel = () => {
         closeModal();
     };
 

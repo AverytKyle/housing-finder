@@ -39,6 +39,11 @@
     background-color: #4f91d3;
 }
 
+.login-button:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 .errors {
     color: #ff3333;
     margin: 5px 0;

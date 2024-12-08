@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useModal } from '../../context/Modal';
 import * as spotActions from '../../store/spots';
@@ -8,7 +7,7 @@ function DeleteSpotModal({ spotId }) {
     const { closeModal } = useModal();
     const dispatch = useDispatch();
 
-    const handleclick = (e) => {
+    const handleclick = () => {
         dispatch(spotActions.deleteSpot(spotId))
             .then(() => {
                 dispatch(spotActions.getCurrentUserSpots());
@@ -16,7 +15,7 @@ function DeleteSpotModal({ spotId }) {
         closeModal();
     };
 
-    const handleCancel = (e) => {
+    const handleCancel = () => {
         closeModal();
     };
 

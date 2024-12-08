@@ -33,13 +33,13 @@ function SpotDetails() {
         <div className='spot-details-reviews'>
             <h2 className='spot-name'>{spotDetails.name}</h2>
             <h3 className='location'>{spotDetails.city}, {spotDetails.state}, {spotDetails.country}</h3>
-            {spotDetails.SpotImages.map((image, index) => (
-                <div key={index} className='img-container'>
-                    <img src={image.url} />
-                </div>
-            ))}
+            <div className='img-container'>
+                {spotDetails.SpotImages.map((image, index) => (
+                    <img key={index} src={image.url} />
+                ))}
+            </div>
             <div className='descrip-price'>
-                <div>
+                <div className='description-container'>
                     <h2 className='owner-name'>Hosted by {spotDetails.Owner?.firstName} {spotDetails.Owner?.lastName}</h2>
                     <p className='description'>{spotDetails.description}</p>
                 </div>

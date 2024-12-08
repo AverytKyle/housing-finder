@@ -64,14 +64,6 @@ const UpdateSpot = () => {
     }
 
     useEffect(() => {
-        dispatch(spotActions.getSpotById(spotId));
-    }, [dispatch, spotId]);
-
-    if (!spot) {
-        return <div>Loading...</div>;
-    }
-
-    useEffect(() => {
         if (spot && Object.keys(spot).length > 0) {
             setCountry(spot.country);
             setAddress(spot.address);
@@ -85,6 +77,14 @@ const UpdateSpot = () => {
             // setImageUrls(spot.SpotImages.map(image => image.url));
         }
     }, [spot]);
+
+    useEffect(() => {
+        dispatch(spotActions.getSpotById(spotId));
+    }, [dispatch, spotId]);
+
+    if (!spot) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div>

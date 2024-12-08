@@ -19,7 +19,7 @@ const CreateSpotForm = () => {
     // const [imageUrls, setImageUrls] = useState(['', '', '', '', '']);
     const [errors, setErrors] = useState("");
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         setErrors({});
 
@@ -39,7 +39,7 @@ const CreateSpotForm = () => {
         }
 
         try {
-            const response = await dispatch(spotActions.createSpot({
+            dispatch(spotActions.createSpot({
                 address,
                 city,
                 state,
@@ -120,45 +120,52 @@ const CreateSpotForm = () => {
                         />
                     </label>
                 </div>
-                <h2>Describe your spot to guests</h2>
-                <p>Mention the best features of your space, any special amentities like fast wifi or parking, and what you love about the neighborhood.</p>
-                <label className="description-label">
-                    <textarea className="description-input-box"
-                        type="text"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        required
-                    />
-                </label>
-                {errors.description && <p className="errors">{errors.description}</p>}
-                <h2>Create a title for your spot</h2>
-                <p>Catch guests&apos; attention with a spot that highlights what makes your place special.</p>
-                <label className="name-label">
-                    <input className="name-label"
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                    />
-                </label>
-                {errors.name && <p className="errors">{errors.name}</p>}
-                <h2>Set a base price for your spot</h2>
-                <p>Competative pricing can help your listing stand out and rank higher in search results.</p>
-                <label className="price-label">
-                    <div className="price">
-                        <span className="dollar-sign">$</span>
-                        <input className="description-input-box"
+                <div>
+                    <h2 className="line">Describe your spot to guests</h2>
+                    <p>Mention the best features of your space, any special amentities like fast wifi or parking, and what you love about the neighborhood.</p>
+                    <label className="description-label">
+                        <textarea className="description-input-box"
                             type="text"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
                             required
                         />
-                    </div>
-                </label>
-                {errors.price && <p className="errors">{errors.price}</p>}
-                <h2>Add a photo for your spot</h2>
-                <p>Submit a link to at least one photo to publish your spot.</p>
-                {/* {imageUrls.map((url, index) => (
+                    </label>
+                    {errors.description && <p className="errors">{errors.description}</p>}
+                </div>
+                <div>
+                    <h2 className="line">Create a title for your spot</h2>
+                    <p>Catch guests&apos; attention with a spot that highlights what makes your place special.</p>
+                    <label className="name-label">
+                        <input className="name-label"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </label>
+                    {errors.name && <p className="errors">{errors.name}</p>}
+                </div>
+                <div>
+                    <h2 className="line">Set a base price for your spot</h2>
+                    <p>Competative pricing can help your listing stand out and rank higher in search results.</p>
+                    <label className="price-label">
+                        <div className="price">
+                            <span className="dollar-sign">$</span>
+                            <input className="description-input-box"
+                                type="text"
+                                value={price}
+                                onChange={(e) => setPrice(e.target.value)}
+                                required
+                            />
+                        </div>
+                    </label>
+                    {errors.price && <p className="errors">{errors.price}</p>}
+                </div>
+                <div>
+                    <h2 className="line">Add a photo for your spot</h2>
+                    <p>Submit a link to at least one photo to publish your spot.</p>
+                    {/* {imageUrls.map((url, index) => (
                     <label key={index} className="image-label">
                         <input
                             type="text"
@@ -172,6 +179,7 @@ const CreateSpotForm = () => {
                         />
                     </label>
                 ))} */}
+                </div>
                 <button className="create-spot-button">Create Spot</button>
             </form>
         </div>

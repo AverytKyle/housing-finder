@@ -8,6 +8,8 @@
     margin: 0;
     position: absolute;
     right: 25px;
+    z-index: 1000;
+    background-color: white;
 }
 
 .user-info {
@@ -51,6 +53,7 @@
     display: flex;
     justify-content: space-between;
     padding: 1rem;
+    border-bottom: 2px solid grey;
 }
 
 .profile {
@@ -63,4 +66,19 @@
 .menu-icons a {
     text-decoration: none;
     color: royalblue;
+}
+
+.logout {
+    text-decoration: none;
+    color: #333;
+    width: 100%;
+    margin-top: 9px;
+    padding: 5px;
+    border-radius: 4px;
+    background-color: #DCDCDC;
+}
+
+.logout:hover {
+    background-color: #C0C0C0;
+    cursor: pointer;
 }

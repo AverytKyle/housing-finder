@@ -64,25 +64,25 @@ const ProfileButton = ({ user }) => {
                             <NavLink to={"/spots/current"} onClick={handleManageSpots}>Manage Spots</NavLink>
                         </div>
                         <div>
-                            <button onClick={logout}>Log Out</button>
+                            <button className="logout" onClick={logout}>Log Out</button>
                         </div>
                     </div>
                 ) : (
                     <>
-                        <li className="login-modal">
+                        <div className="login-modal">
                             <OpenModalMenuItem
                                 itemText="Log In"
                                 onItemClick={closeMenu}
                                 modalComponent={<LoginFormModal />}
                             />
-                        </li>
-                        <li className="signup-modal">
+                        </div>
+                        <div className="signup-modal">
                             <OpenModalMenuItem
                                 itemText="Sign Up"
                                 onItemlick={closeMenu}
                                 modalComponent={<SignupFormModal />}
                             />
-                        </li>
+                        </div>
                     </>
                 )}
             </ul>
