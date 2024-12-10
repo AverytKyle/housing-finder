@@ -54,8 +54,10 @@ function CreateReviewModal({ spotId }) {
         setStars(star);
     };
 
+    const modalHeight = errors.review ? '350px' : '300px';
+
     return (
-        <div className='create-review-modal'>
+        <div className='create-review-modal' style={{ height: modalHeight }}>
             <h1 className='title'>How was your stay?</h1>
             <form className='review-form'>
                 {errors.review && <p className="errors" style={{ color: 'red', margin: '5px 0' }}>{errors.review}</p>}

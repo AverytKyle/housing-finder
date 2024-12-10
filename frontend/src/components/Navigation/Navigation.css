@@ -82,3 +82,23 @@
     background-color: #C0C0C0;
     cursor: pointer;
 }
+
+.home-icon img {
+    width: 50px;
+    vertical-align: middle
+}
+
+.home-icon:hover {
+    box-shadow: 4px 4px 4px 0 #DCDCDC;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-text {
+    font-size: 15pt;
+}

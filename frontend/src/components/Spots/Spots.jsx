@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { createSelector } from 'reselect';
 import { getSpots } from '../../store/spots';
-import { getReviewsBySpotId } from '../../store/reviews';
 import './Spots.css';
 
 const selectSpots = createSelector(

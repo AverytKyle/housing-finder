@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ProfileButton from './ProfileButton';
 import './Navigation.css';
@@ -9,7 +9,10 @@ function Navigation({ isLoaded }) {
   return (
     <div className='menu-icons'>
       <div className='home-icon'>
-        <NavLink to="/">Home</NavLink>
+        <Link to="/" className="logo">
+          <img src="https://png.pngtree.com/element_our/png/20181214/real-estate-house-logo-graphic-design-template-vector-illustration-png_269519.jpg" alt="logo" />
+          <span className='logo-text'>Housing Finder</span>
+        </Link>
       </div>
       <div className='profile'>
         {isLoaded && sessionUser && (

@@ -73,6 +73,32 @@
 .review-container {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 97.5%;
     padding: 25px;
+}
+
+.create-review-button {
+    width: 200px;
+    padding: 10px;
+    background-color: #23588d;
+    color: white;
+    box-shadow: 2px 2px 2px black;
+}
+
+.create-review-button:hover {
+    cursor: pointer;
+    background-color: #1f4e78;
+}
+
+.delete-button {
+    width: 100px;
+    padding: 10px;
+    background-color: #23588d;
+    color: white;
+    box-shadow: 2px 2px 2px black;
+}
+
+.delete-button:hover {
+    cursor: pointer;
+    background-color: #1f4e78;
 }

@@ -28,10 +28,10 @@ const CreateSpotForm = () => {
         if (country.length < 2) frontendErrors.country = "Country must be at least 2 characters";
         if (address.length < 5) frontendErrors.address = "Address must be at least 5 characters";
         if (city.length < 2) frontendErrors.city = "City must be at least 2 characters";
-        if (state.length < 2) frontendErrors.state = "State must be at least 2 characters";
+        if (state.length < 2) frontendErrors.state = "State is required";
         if (description.length < 30) frontendErrors.description = "Description needs 30 or more characters";
         if (name.length < 2) frontendErrors.name = "Name must be at least 2 characters";
-        if (price <= 0) frontendErrors.price = "Price must be greater than 0";
+        if (price <= 0 || isNaN(price)) frontendErrors.price = "Price is required";
 
         if (Object.keys(frontendErrors).length > 0) {
             setErrors(frontendErrors);
@@ -162,7 +162,7 @@ const CreateSpotForm = () => {
                     </label>
                     {errors.price && <p className="errors">{errors.price}</p>}
                 </div>
-                <div>
+                <div className="image-container">
                     <h2 className="line">Add a photo for your spot</h2>
                     <p>Submit a link to at least one photo to publish your spot.</p>
                     {/* {imageUrls.map((url, index) => (
@@ -180,7 +180,9 @@ const CreateSpotForm = () => {
                     </label>
                 ))} */}
                 </div>
-                <button className="create-spot-button">Create Spot</button>
+                <div className="button-container">
+                    <button className="create-spot-button">Create Spot</button>
+                </div>
             </form>
         </div>
     )

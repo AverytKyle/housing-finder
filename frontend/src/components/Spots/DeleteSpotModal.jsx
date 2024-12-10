@@ -1,6 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { useModal } from '../../context/Modal';
 import * as spotActions from '../../store/spots';
+import './DeleteSpotModal.css';
 
 
 function DeleteSpotModal({ spotId }) {
@@ -22,6 +23,7 @@ function DeleteSpotModal({ spotId }) {
     return (
         <div className='confirm-delete-modal'>
             <h1 className='title'>Confirm Delete</h1>
+            <p className='delete-confirmation'>Are you sure you want to remove this spot from the listings?</p>
             <div className='button-container'>
                 <button className='yes-button' onClick={handleclick}>Yes (Delete Spot)</button>
                 <button className='no-button' onClick={handleCancel}>No (Keep Spot)</button>

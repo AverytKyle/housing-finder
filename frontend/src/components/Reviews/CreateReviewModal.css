@@ -28,6 +28,8 @@
     font-size: 14px;
     width: 100%;
     height: 100px;
+    box-sizing: none;
+    resize: none;
 }
 
 .modal-stars {
@@ -51,4 +53,9 @@
 .submit-button:disabled {
     opacity: 0.5;
     pointer-events: none;
+}
+
+.errors {
+    color: red;
+    text-align: center;
 }
