@@ -59,7 +59,7 @@ export const getSpotById = (id) => async dispatch => {
 }
 
 export const createSpot = (spot) => async dispatch => {
-    console.log('createSpot function called');
+    console.log('Creating spot:', spot);
     const {
         address,
         city,
@@ -70,9 +70,9 @@ export const createSpot = (spot) => async dispatch => {
         name,
         description,
         price,
-        imageUrls
     } = spot;
 
+    try{
     //First create the spot
     const response = await csrfFetch('/api/spots', {
         method: 'POST',
@@ -89,28 +89,16 @@ export const createSpot = (spot) => async dispatch => {
         })
     });
 
-    const data = await response.json();
-
-    if (!data.spot) {
-        console.error('Error creating spot:', data);
-        return;
+    if (response.ok) {
+        const spot = await response.json();
+        dispatch(addNewSpot(spot));
+        return spot;
+      } else {
+        console.error('Error creating spot:', response);
+      }
+    } catch (error) {
+      console.error('Error creating spot:', error);
     }
-    
-    // Then add the image to the spot
-    if (imageUrls.length > 0) {
-        await Promise.all(imageUrls.map(async imageUrl => {
-            await csrfFetch(`/api/spots/${data.spot.id}/images`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    url: imageUrl,
-                    preview: true
-                })
-            });
-        }));
-    }
-
-    dispatch(addNewSpot(data.spot));
-    return response;
 }
 
 export const getCurrentUserSpots = () => async dispatch => {
@@ -134,7 +122,6 @@ export const updateSpot = (spotId, spot) => async dispatch => {
         name,
         description,
         price,
-        imageUrl
     } = spot;
 
     // Update spot details
@@ -156,15 +143,15 @@ export const updateSpot = (spotId, spot) => async dispatch => {
     const data = await response.json();
 
     // Add new image if provided
-    if (imageUrl) {
-        await csrfFetch(`/api/spots/${spotId}/images`, {
-            method: 'POST',
-            body: JSON.stringify({
-                url: imageUrl,
-                preview: true
-            })
-        });
-    }
+    // if (imageUrl) {
+    //     await csrfFetch(`/api/spots/${spotId}/images`, {
+    //         method: 'POST',
+    //         body: JSON.stringify({
+    //             url: imageUrl,
+    //             preview: true
+    //         })
+    //     });
+    // }
 
     dispatch(update(data));
     return response;

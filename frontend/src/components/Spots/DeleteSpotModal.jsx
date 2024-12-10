@@ -10,9 +10,9 @@ function DeleteSpotModal({ spotId }) {
 
     const handleclick = () => {
         dispatch(spotActions.deleteSpot(spotId))
-            .then(() => {
-                dispatch(spotActions.getCurrentUserSpots());
-            });
+            .then(
+                window.location.href = '/spots/current'
+            );
         closeModal();
     };
 

@@ -22,9 +22,9 @@ const ManageUserSpots = () => {
         dispatch(spotActions.getCurrentUserSpots());
     }, [dispatch])
 
-    const clickHandler = () => {
+    const clickHandler = (e) => {
         if (e.target.tagName !== 'BUTTON') {
-            navigate(`/spots/${spot.id}`)
+            navigate(`/spots/${spots.id}`)
         }
     }
 

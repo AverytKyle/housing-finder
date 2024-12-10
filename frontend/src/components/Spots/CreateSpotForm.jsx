@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as spotActions from '../../store/spots';
+import { createImage } from "../../store/images";
 import './CreateSpotForm.css';
 
 const CreateSpotForm = () => {
@@ -16,7 +17,7 @@ const CreateSpotForm = () => {
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [name, setName] = useState("");
-    // const [imageUrls, setImageUrls] = useState(['', '', '', '', '']);
+    const [imageUrls, setImageUrls] = useState(['', '', '', '', '']);
     const [errors, setErrors] = useState("");
 
     const handleSubmit = (e) => {
@@ -49,12 +50,17 @@ const CreateSpotForm = () => {
                 name,
                 description,
                 price,
-                // imageUrls
-            }));
-            navigate(`/`);
+            })).then(async (spot) => {
+                console.log('Created spot:', spot);
+                await Promise.all(imageUrls.map(async (imageUrl) => {
+                    if (imageUrl) {
+                        await dispatch(createImage(imageUrl, spot.id));
+                    }
+                }));
+            })
+            navigate(`/`);;
         } catch (error) {
             console.error(error);
-            // You can display an error message to the user here
         }
     }
 
@@ -165,7 +171,7 @@ const CreateSpotForm = () => {
                 <div className="image-container">
                     <h2 className="line">Add a photo for your spot</h2>
                     <p>Submit a link to at least one photo to publish your spot.</p>
-                    {/* {imageUrls.map((url, index) => (
+                    {imageUrls.map((url, index) => (
                     <label key={index} className="image-label">
                         <input
                             type="text"
@@ -178,7 +184,7 @@ const CreateSpotForm = () => {
                             placeholder="Image URL"
                         />
                     </label>
-                ))} */}
+                ))}
                 </div>
                 <div className="button-container">
                     <button className="create-spot-button">Create Spot</button>
