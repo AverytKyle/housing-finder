@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as spotActions from '../../store/spots';
-import { createImage } from "../../store/images";
 import './CreateSpotForm.css';
 
 const CreateSpotForm = () => {
@@ -20,7 +19,7 @@ const CreateSpotForm = () => {
     const [imageUrls, setImageUrls] = useState(['', '', '', '', '']);
     const [errors, setErrors] = useState("");
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setErrors({});
 
@@ -40,7 +39,8 @@ const CreateSpotForm = () => {
         }
 
         try {
-            dispatch(spotActions.createSpot({
+            console.log('imageUrls before dispatch:', imageUrls);
+            const spot = await dispatch(spotActions.createSpot({
                 address,
                 city,
                 state,
@@ -50,15 +50,23 @@ const CreateSpotForm = () => {
                 name,
                 description,
                 price,
-            })).then(async (spot) => {
-                console.log('Created spot:', spot);
-                await Promise.all(imageUrls.map(async (imageUrl) => {
+                imageUrls
+            }));
+
+            // Once spot is created, add images
+            if (spot && imageUrls.length > 0) {
+                const uniqueImageUploads = [...new Set(imageUrls)];
+                await Promise.all(uniqueImageUploads.map(async (imageUrl, index) => {
                     if (imageUrl) {
-                        await dispatch(createImage(imageUrl, spot.id));
+                        await dispatch(spotActions.addSpotImage({
+                            url: imageUrl,
+                            preview: index === 0
+                        }, spot.id));
                     }
                 }));
-            })
-            navigate(`/`);;
+            }            
+
+            navigate('/');
         } catch (error) {
             console.error(error);
         }
@@ -172,19 +180,19 @@ const CreateSpotForm = () => {
                     <h2 className="line">Add a photo for your spot</h2>
                     <p>Submit a link to at least one photo to publish your spot.</p>
                     {imageUrls.map((url, index) => (
-                    <label key={index} className="image-label">
-                        <input
-                            type="text"
-                            value={url}
-                            onChange={(e) => {
-                                const newUrls = [...imageUrls];
-                                newUrls[index] = e.target.value;
-                                setImageUrls(newUrls);
-                            }}
-                            placeholder="Image URL"
-                        />
-                    </label>
-                ))}
+                        <label key={index} className="image-label">
+                            <input
+                                type="text"
+                                value={url}
+                                onChange={(e) => {
+                                    const newUrls = [...imageUrls];
+                                    newUrls[index] = e.target.value;
+                                    setImageUrls(newUrls);
+                                }}
+                                placeholder="Image URL"
+                            />
+                        </label>
+                    ))}
                 </div>
                 <div className="button-container">
                     <button className="create-spot-button">Create Spot</button>

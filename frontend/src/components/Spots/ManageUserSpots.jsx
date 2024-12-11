@@ -22,12 +22,6 @@ const ManageUserSpots = () => {
         dispatch(spotActions.getCurrentUserSpots());
     }, [dispatch])
 
-    const clickHandler = (e) => {
-        if (e.target.tagName !== 'BUTTON') {
-            navigate(`/spots/${spots.id}`)
-        }
-    }
-
     if (!spots) {
         return <div>Loading...</div>;
     }
@@ -38,7 +32,11 @@ const ManageUserSpots = () => {
             <button className="create-new-spot" onClick={() => navigate('/spots')}>Create a New Spot</button>
             <div className="spots-container">
                 {Object.values(spots).map((spot, index) => (
-                    <div key={index} className="spot-card" onClick={clickHandler}>
+                    <div key={index} className="spot-card" onClick={(e) => {
+                        if (e.target.tagName !== 'BUTTON') {
+                            navigate(`/spots/${spot.id}`)
+                        }
+                    }}>
                         <div className='spot-stuff'>
                             <img className='spot-img' src={spot.previewImage} alt={spot.name} />
                             <div className='spot-info-container'>

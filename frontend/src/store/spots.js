@@ -1,12 +1,11 @@
 import { csrfFetch } from "./csrf";
 
-
-
 const LOAD = 'spots/LOAD';
 const LOAD_BY_ID = 'spots/LOAD_BY_ID';
 const CREATE_SPOT = 'spots/CREATE_SPOT';
 const UPDATE_SPOT = 'spots/UPDATE_SPOT';
 const REMOVE_SPOT = 'spots/REMOVE_SPOT';
+const ADD_SPOT_IMAGE = 'spots/ADD_SPOT_IMAGE';
 
 
 const load = spots => ({
@@ -34,6 +33,11 @@ const removeSpot = (spotId) => ({
     spotId
 })
 
+const addImage = (image, spotId) => ({
+    type: ADD_SPOT_IMAGE,
+    payload: {image, spotId}
+})
+
 export const getSpots = () => async dispatch => {
     const response = await fetch(`/api/spots`);
 
@@ -58,48 +62,64 @@ export const getSpotById = (id) => async dispatch => {
     }
 }
 
-export const createSpot = (spot) => async dispatch => {
-    console.log('Creating spot:', spot);
-    const {
-        address,
-        city,
-        state,
-        country,
-        lat,
-        lng,
-        name,
-        description,
-        price,
-    } = spot;
-
-    try{
-    //First create the spot
-    const response = await csrfFetch('/api/spots', {
+export const addSpotImage = (imageData, spotId) => async dispatch => {
+    console.log('Creating image with:', { imageData, spotId });
+    const response = await csrfFetch(`/api/spots/${spotId}/images`, {
         method: 'POST',
         body: JSON.stringify({
-            address,
-            city,
-            state,
-            country,
-            lat,
-            lng,
-            name,
-            description,
-            price
+            url: imageData.url,
+            preview: imageData.preview
         })
+    });
+
+    if (response.ok) {
+        const image = await response.json();
+        console.log('Received image from backend:', image);
+        dispatch(addImage(image, spotId));
+        return image;
+    }
+};
+
+export const createSpot = (spotData) => async dispatch => {
+    
+    const formattedData = {
+        address: spotData.address,
+        city: spotData.city,
+        state: spotData.state,
+        country: spotData.country,
+        lat: Number(spotData.lat),
+        lng: Number(spotData.lng),
+        name: spotData.name,
+        description: spotData.description,
+        price: Number(spotData.price)
+    };
+
+    const response = await csrfFetch('/api/spots', {
+        method: 'POST',
+        body: JSON.stringify(formattedData)
     });
 
     if (response.ok) {
         const spot = await response.json();
         dispatch(addNewSpot(spot));
+
+        // Handle multiple images
+        if (spotData.imageUrls) {
+            console.log('imageUrls:', spotData.imageUrls);
+            for (let i = 0; i < spotData.imageUrls.length; i++) {
+                const imageUrl = spotData.imageUrls[i];
+                if (imageUrl) {
+                    await dispatch(addSpotImage({
+                        url: imageUrl,
+                        preview: i === 0
+                    }, spot.id));
+                }
+            }
+        }
+
         return spot;
-      } else {
-        console.error('Error creating spot:', response);
-      }
-    } catch (error) {
-      console.error('Error creating spot:', error);
     }
-}
+};
 
 export const getCurrentUserSpots = () => async dispatch => {
     const response = await csrfFetch('/api/spots/current');
@@ -130,7 +150,7 @@ export const updateSpot = (spotId, spot) => async dispatch => {
         body: JSON.stringify({
             address,
             city,
-            state, 
+            state,
             country,
             lat,
             lng,
@@ -176,10 +196,21 @@ const spotsReducer = (state = initialState, action) => {
             newState.allSpots = {};
             const spotsArray = action.spots.Spots;
             spotsArray.forEach(spot => {
-              newState.allSpots[spot.id] = spot;
+                // Ensure SpotImages array is properly set from backend data
+                newState.allSpots[spot.id] = {
+                    ...spot,
+                    SpotImages: spot.SpotImages || []
+                };
             });
             return newState;
         }
+        
+        case CREATE_SPOT: {
+            const newState = { ...state };
+            newState.allSpots[action.payload.id] = action.payload;
+            newState.allSpots[action.payload.id].SpotImages = [];
+            return newState;
+        }        
         case LOAD_BY_ID: {
             const newState = { ...state };
             newState.allSpots = { ...action.spot };
@@ -193,6 +224,22 @@ const spotsReducer = (state = initialState, action) => {
         case REMOVE_SPOT: {
             const newState = { ...state };
             delete newState.allSpots[action.spotId];
+            return newState;
+        }
+        case ADD_SPOT_IMAGE: {
+            const newState = { ...state };
+            const { image, spotId } = action.payload;
+            console.log('Current spot before update:', newState.allSpots[spotId]);
+
+
+            if (newState.allSpots[spotId]) {
+                if (!newState.allSpots[spotId].SpotImages) {
+                    newState.allSpots[spotId].SpotImages = [];
+                }
+                newState.allSpots[spotId].SpotImages.push(image);
+                console.log('SpotImages after update:', newState.allSpots[spotId].SpotImages);
+
+            }
             return newState;
         }
         default:

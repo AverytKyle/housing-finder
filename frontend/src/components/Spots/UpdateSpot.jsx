@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as spotActions from '../../store/spots';
+// import createImage from "../../store/images";
 
 const UpdateSpot = () => {
     const dispatch = useDispatch();
@@ -49,7 +50,6 @@ const UpdateSpot = () => {
             name,
             description,
             price,
-            // imageUrls
         };
 
         return dispatch(spotActions.updateSpot(spotId, updatedSpot))
