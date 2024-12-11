@@ -63,7 +63,6 @@ export const getSpotById = (id) => async dispatch => {
 }
 
 export const addSpotImage = (imageData, spotId) => async dispatch => {
-    console.log('Creating image with:', { imageData, spotId });
     const response = await csrfFetch(`/api/spots/${spotId}/images`, {
         method: 'POST',
         body: JSON.stringify({
@@ -74,7 +73,6 @@ export const addSpotImage = (imageData, spotId) => async dispatch => {
 
     if (response.ok) {
         const image = await response.json();
-        console.log('Received image from backend:', image);
         dispatch(addImage(image, spotId));
         return image;
     }
@@ -104,17 +102,15 @@ export const createSpot = (spotData) => async dispatch => {
         dispatch(addNewSpot(spot));
 
         // Handle multiple images
-        if (spotData.imageUrls) {
-            console.log('imageUrls:', spotData.imageUrls);
-            for (let i = 0; i < spotData.imageUrls.length; i++) {
-                const imageUrl = spotData.imageUrls[i];
+        if (spotData.imageUrls && spotData.imageUrls.length > 0) {
+            await Promise.all(spotData.imageUrls.map((imageUrl, index) => {
                 if (imageUrl) {
-                    await dispatch(addSpotImage({
+                    return dispatch(addSpotImage({
                         url: imageUrl,
-                        preview: i === 0
+                        preview: index === 0
                     }, spot.id));
                 }
-            }
+            }));
         }
 
         return spot;
@@ -229,16 +225,12 @@ const spotsReducer = (state = initialState, action) => {
         case ADD_SPOT_IMAGE: {
             const newState = { ...state };
             const { image, spotId } = action.payload;
-            console.log('Current spot before update:', newState.allSpots[spotId]);
-
 
             if (newState.allSpots[spotId]) {
                 if (!newState.allSpots[spotId].SpotImages) {
                     newState.allSpots[spotId].SpotImages = [];
                 }
                 newState.allSpots[spotId].SpotImages.push(image);
-                console.log('SpotImages after update:', newState.allSpots[spotId].SpotImages);
-
             }
             return newState;
         }

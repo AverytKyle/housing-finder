@@ -53,19 +53,6 @@ const CreateSpotForm = () => {
                 imageUrls
             }));
 
-            // Once spot is created, add images
-            if (spot && imageUrls.length > 0) {
-                const uniqueImageUploads = [...new Set(imageUrls)];
-                await Promise.all(uniqueImageUploads.map(async (imageUrl, index) => {
-                    if (imageUrl) {
-                        await dispatch(spotActions.addSpotImage({
-                            url: imageUrl,
-                            preview: index === 0
-                        }, spot.id));
-                    }
-                }));
-            }            
-
             navigate('/');
         } catch (error) {
             console.error(error);

@@ -18,7 +18,7 @@ const UpdateSpot = () => {
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [name, setName] = useState("");
-    // const [imageUrls, setImageUrls] = useState(['', '', '', '', '']);
+    const [imageUrls, setImageUrls] = useState(['', '', '', '', '']);
     const [errors, setErrors] = useState("");
 
     const handleSubmit = (e) => {
@@ -50,6 +50,7 @@ const UpdateSpot = () => {
             name,
             description,
             price,
+            imageUrls
         };
 
         return dispatch(spotActions.updateSpot(spotId, updatedSpot))
@@ -74,7 +75,7 @@ const UpdateSpot = () => {
             setDescription(spot.description);
             setPrice(spot.price);
             setName(spot.name);
-            // setImageUrls(spot.SpotImages.map(image => image.url));
+            setImageUrls(spot.SpotImages.map(image => image.url));
         }
     }, [spot]);
 
@@ -186,7 +187,7 @@ const UpdateSpot = () => {
                 {errors.price && <p className="errors">{errors.price}</p>}
                 <h2>Add a photo for your spot</h2>
                 <p>Submit a link to at least one photo to publish your spot.</p>
-                {/* {imageUrls.map((url, index) => (
+                {imageUrls.map((url, index) => (
                     <label key={index} className="image-label">
                         <input
                             type="text"
@@ -199,7 +200,7 @@ const UpdateSpot = () => {
                             placeholder="Image URL"
                         />
                     </label>
-                ))} */}
+                ))}
                 <button className="create-spot-button">Update Spot</button>
             </form>
         </div>

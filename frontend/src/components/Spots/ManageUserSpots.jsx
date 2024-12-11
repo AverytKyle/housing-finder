@@ -33,7 +33,7 @@ const ManageUserSpots = () => {
             <div className="spots-container">
                 {Object.values(spots).map((spot, index) => (
                     <div key={index} className="spot-card" onClick={(e) => {
-                        if (e.target.tagName !== 'BUTTON') {
+                        if (e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
                             navigate(`/spots/${spot.id}`)
                         }
                     }}>
