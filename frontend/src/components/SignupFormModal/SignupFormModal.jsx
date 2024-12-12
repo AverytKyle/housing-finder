@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-// import { Navigate } from 'react-router-dom';
 import * as sessionActions from '../../store/session';
 import './SignupForm.css';
 
 const SignupFormModal = () => {
     const dispatch = useDispatch();
     const sessionUser = useSelector((state) => state.session.user);
-    // const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -120,7 +118,19 @@ const SignupFormModal = () => {
                     />
                 </label>
                 {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
-                <button className="signup-button" type="submit">Sign Up</button>
+                <button
+                    className="signup-button"
+                    type="submit"
+                    disabled={
+                        firstName === "" ||
+                        username === "" ||
+                        lastName === "" ||
+                        email === "" ||
+                        password === "" ||
+                        confirmPassword === ""
+                    }>
+                    Sign Up
+                </button>
             </form>
         </div>
     )
