@@ -128,50 +128,53 @@ export const getCurrentUserSpots = () => async dispatch => {
 };
 
 export const updateSpot = (spotId, spot) => async dispatch => {
-    const {
-        address,
-        city,
-        state,
-        country,
-        lat,
-        lng,
-        name,
-        description,
-        price,
-    } = spot;
+    // Get current spot data to access correct image IDs
+    const currentSpotResponse = await csrfFetch(`/api/spots/${spotId}`);
+    const currentSpot = await currentSpotResponse.json();
 
     // Update spot details
     const response = await csrfFetch(`/api/spots/${spotId}`, {
         method: 'PUT',
         body: JSON.stringify({
-            address,
-            city,
-            state,
-            country,
-            lat,
-            lng,
-            name,
-            description,
-            price
+            address: spot.address,
+            city: spot.city,
+            state: spot.state,
+            country: spot.country,
+            lat: spot.lat,
+            lng: spot.lng,
+            name: spot.name,
+            description: spot.description,
+            price: spot.price
         })
     });
 
     const data = await response.json();
 
-    // Add new image if provided
-    // if (imageUrl) {
-    //     await csrfFetch(`/api/spots/${spotId}/images`, {
-    //         method: 'POST',
-    //         body: JSON.stringify({
-    //             url: imageUrl,
-    //             preview: true
-    //         })
-    //     });
-    // }
+    // Delete existing images using correct IDs from currentSpot
+    if (currentSpot.SpotImages && currentSpot.SpotImages.length > 0) {
+        await Promise.all(currentSpot.SpotImages.map(image => 
+            csrfFetch(`/api/spot-images/${image.id}`, {
+                method: 'DELETE'
+            })
+        ));
+    }
+
+    // Add new images
+    if (spot.imageUrls && spot.imageUrls.length > 0) {
+        await Promise.all(spot.imageUrls.map((imageUrl, index) => {
+            if (imageUrl) {
+                return dispatch(addSpotImage({
+                    url: imageUrl,
+                    preview: index === 0
+                }, spotId));
+            }
+        }));
+    }
 
     dispatch(update(data));
     return response;
 }
+
 
 export const deleteSpot = (spotId) => async dispatch => {
     const response = await csrfFetch(`/api/spots/${spotId}`, {

@@ -4,7 +4,7 @@ const { requireAuth } = require('../../utils/auth');
 
 const router = express.Router();
 
-// DELETE /spot-images/:spotId - Deletes an image for a spot
+// DELETE /spot-images - Deletes an image for a spot
 router.delete('/:imageId', requireAuth, async (req, res, next) => {
   const { imageId } = req.params;
   const { user } = req;

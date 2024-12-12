@@ -2,6 +2,7 @@ import { AiOutlineUser } from "react-icons/ai";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as sessionActions from '../../store/session';
 import OpenModalMenuItem from "./OpenModalMenuItem";
 import LoginFormModal from '../LoginFormModal/LoginFormModal';
@@ -11,12 +12,15 @@ import './Navigation.css';
 
 const ProfileButton = ({ user }) => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [showMenu, setShowMenu] = useState(false);
     const ulRef = useRef();
 
     const logout = (e) => {
         e.preventDefault();
         dispatch(sessionActions.logout());
+        setShowMenu(false);
+        navigate('/');
     };
 
     const toggleMenu = (e) => {

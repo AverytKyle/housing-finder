@@ -38,3 +38,7 @@
 .signup-button:hover {
     background-color: #4f91d3;
 }
+
+.error {
+    color: red;
+}

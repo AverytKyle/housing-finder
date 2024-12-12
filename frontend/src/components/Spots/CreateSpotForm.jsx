@@ -40,7 +40,7 @@ const CreateSpotForm = () => {
 
         try {
             console.log('imageUrls before dispatch:', imageUrls);
-            const spot = await dispatch(spotActions.createSpot({
+            await dispatch(spotActions.createSpot({
                 address,
                 city,
                 state,

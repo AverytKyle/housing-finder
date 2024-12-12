@@ -7,6 +7,7 @@ import './SignupForm.css';
 const SignupFormModal = () => {
     const dispatch = useDispatch();
     const sessionUser = useSelector((state) => state.session.user);
+    const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -19,6 +20,20 @@ const SignupFormModal = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        const frontendErrors = {};
+
+        if (username.length < 4) frontendErrors.username = "Username must be at least 4 characters";
+        if (firstName.length < 2) frontendErrors.firstName = "First Name must be at least 2 characters";
+        if (lastName.length < 2) frontendErrors.lastName = "Last Name must be at least 2 characters";
+        if (!email.includes("@")) frontendErrors.email = "Email must be valid";
+        if (password.length < 6) frontendErrors.password = "Password must be at least 6 characters";
+
+        if (Object.keys(frontendErrors).length > 0) {
+            setErrors(frontendErrors);
+            return;
+        }
+
         if (password === confirmPassword) {
             setErrors({});
             return dispatch(sessionActions.signup({
@@ -38,6 +53,7 @@ const SignupFormModal = () => {
         return setErrors({
             confirmPassword: 'Confirm Password field must be the same as the Password field'
         })
+
     }
 
     return (
@@ -53,7 +69,7 @@ const SignupFormModal = () => {
                         required
                     />
                 </label>
-                {errors.email && <p>{errors.email}</p>}
+                {errors.email && <p className="error">{errors.email}</p>}
                 <label className="input-label">
                     Username
                     <input
@@ -63,7 +79,7 @@ const SignupFormModal = () => {
                         required
                     />
                 </label>
-                {errors.username && <p>{errors.username}</p>}
+                {errors.username && <p className="error">{errors.username}</p>}
                 <label className="input-label">
                     First Name
                     <input
@@ -73,7 +89,7 @@ const SignupFormModal = () => {
                         required
                     />
                 </label>
-                {errors.firstName && <p>{errors.firstName}</p>}
+                {errors.firstName && <p className="error">{errors.firstName}</p>}
                 <label className="input-label">
                     Last Name
                     <input
@@ -83,7 +99,7 @@ const SignupFormModal = () => {
                         required
                     />
                 </label>
-                {errors.lastName && <p>{errors.lastName}</p>}
+                {errors.lastName && <p className="error">{errors.lastName}</p>}
                 <label className="input-label">
                     Password
                     <input
@@ -93,7 +109,7 @@ const SignupFormModal = () => {
                         required
                     />
                 </label>
-                {errors.password && <p>{errors.password}</p>}
+                {errors.password && <p className="error">{errors.password}</p>}
                 <label className="input-label">
                     Confirm Password
                     <input
@@ -103,7 +119,7 @@ const SignupFormModal = () => {
                         required
                     />
                 </label>
-                {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
                 <button className="signup-button" type="submit">Sign Up</button>
             </form>
         </div>
