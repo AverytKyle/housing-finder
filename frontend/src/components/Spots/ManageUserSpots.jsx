@@ -15,7 +15,7 @@ const selectSpots = createSelector(
 const ManageUserSpots = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [showModal, setShowModal] = useState(false);
+    const [, setShowModal] = useState(false);
     const spots = useSelector(selectSpots);
 
     useEffect(() => {

@@ -14,7 +14,7 @@ function SpotDetails() {
     const spotDetails = useSelector(state => state.spots.allSpots);
     const reviewDetails = useSelector(state => state.reviews.reviews)
     const sessionUser = useSelector((state) => state.session.user);
-    const [showModal, setShowModal] = useState(false);
+    const [, setShowModal] = useState(false);
 
     useEffect(() => {
         dispatch(getSpotById(spotId));
