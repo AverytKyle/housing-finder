@@ -60,8 +60,7 @@ const ProfileButton = ({ user }) => {
                 {user ? (
                     <div>
                         <div className="user-info">
-                            <p>Hello, {user.username}</p>
-                            <p>{user.firstName} {user.lastName}</p>
+                            <p>Hello, {user.firstName}</p>
                             <p>{user.email}</p>
                         </div>
                         <div className="manage-spots">

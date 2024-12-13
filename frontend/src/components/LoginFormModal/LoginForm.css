@@ -24,7 +24,7 @@
     font-size: 14px
 }
 
-.login-button {
+.login-button, .demo-user {
     background-color: #23588d;
     color: white;
     padding: 10px;
@@ -35,7 +35,7 @@
     font-weight: 500;
 }
 
-.login-button:hover {
+.login-button:hover, .demo-user:hover {
     background-color: #4f91d3;
 }
 
