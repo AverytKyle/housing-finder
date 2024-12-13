@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSpotById } from '../../store/spots';
 import { getReviewsBySpotId } from '../../store/reviews';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons';
 import './SpotDetails.css';
 import CreateReviewModal from '../Reviews/CreateReviewModal';
 import OpenModalMenuItem from '../Navigation/OpenModalMenuItem';
@@ -45,7 +47,7 @@ function SpotDetails() {
                 </div>
                 <div key={spotDetails.id} className='price-reserve-box'>
                     <div className='price-reviews'>
-                        <p className='price'>${spotDetails.price} per night</p>
+                        <p className='price'>${spotDetails.price} night</p>
                         <p className='raiting-reviews'>{spotDetails.avgStarRating} Stars &#x2022; {spotDetails.numReviews} reviews</p>
                     </div>
                     <div className='button'>
@@ -54,7 +56,9 @@ function SpotDetails() {
                 </div>
             </div>
             <div className='review-container'>
-                <h2>{spotDetails.avgStarRating} Stars &#x2022; {spotDetails.numReviews} reviews</h2>
+                <h2>
+                    <FontAwesomeIcon icon={faStarSolid} /> {spotDetails.avgStarRating === '0.0' ? 'New' : spotDetails.avgStarRating} &#x2022; {spotDetails.numReviews === 1 ? spotDetails.numReviews + ' review' : spotDetails.numReviews + ' reviews'}
+                </h2>
                 {sessionUser &&
                     (sessionUser.id !== spotDetails.Owner.id && reviewDetails.userId !== sessionUser.id) &&
                     <button className='create-review-button'>
