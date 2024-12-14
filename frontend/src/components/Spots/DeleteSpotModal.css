@@ -20,7 +20,7 @@
 }
 
 .yes-button {
-    background-color: #23588d;
+    background-color: red;
     color: white;
     padding: 10px;
     border: none;
@@ -31,7 +31,7 @@
 }
 
 .yes-button:hover {
-    background-color: #1f4e78;
+    background-color: rgb(172, 48, 48);
 }
 
 .no-button {

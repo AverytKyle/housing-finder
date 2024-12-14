@@ -37,23 +37,26 @@ const ManageUserSpots = () => {
                             navigate(`/spots/${spot.id}`)
                         }
                     }}>
-                        <div className='spot-stuff'>
-                            <img className='spot-img' src={spot.previewImage} alt={spot.name} />
-                            <div className='spot-info-container'>
-                                <p>{spot.city}, {spot.state}</p>
-                                <p> {spot.avgRating}</p>
+                        <div className="tool-tip">
+                            <div className='spot-stuff'>
+                                <img className='spot-img' src={spot.previewImage} alt={spot.name} />
+                                <div className='spot-info-container'>
+                                    <p>{spot.city}, {spot.state}</p>
+                                    <p> {spot.avgRating}</p>
+                                </div>
+                                <p className='price'>${spot.price} night</p>
                             </div>
-                            <p className='price'>${spot.price} night</p>
-                        </div>
-                        <div className="button-container">
-                            <button className="update" onClick={() => navigate(`/spots/${spot.id}/edit`)}>Update</button>
-                            <button className="delete">
-                                <OpenModalMenuItem
-                                    itemText="Delete"
-                                    onItemClick={() => setShowModal(true)}
-                                    modalComponent={<DeleteSpotModal spotId={spot.id} />}
-                                />
-                            </button>
+                            <div className="button-container">
+                                <button className="update" onClick={() => navigate(`/spots/${spot.id}/edit`)}>Update</button>
+                                <button className="delete">
+                                    <OpenModalMenuItem
+                                        itemText="Delete"
+                                        onItemClick={() => setShowModal(true)}
+                                        modalComponent={<DeleteSpotModal spotId={spot.id} />}
+                                    />
+                                </button>
+                            </div>
+                            <span className="tool-tip-text">{spot.name}</span>
                         </div>
                     </div>
                 ))}

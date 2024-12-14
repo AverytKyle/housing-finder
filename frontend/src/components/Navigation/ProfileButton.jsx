@@ -49,6 +49,11 @@ const ProfileButton = ({ user }) => {
         closeMenu();
     };
 
+    const handleManageReviews = () => {
+
+        closeMenu();
+    }
+
     const ulClassName = "profile-dropdown" + (showMenu ? "" : " hidden");
 
     return (
@@ -65,6 +70,9 @@ const ProfileButton = ({ user }) => {
                         </div>
                         <div className="manage-spots">
                             <NavLink to={"/spots/current"} onClick={handleManageSpots}>Manage Spots</NavLink>
+                        </div>
+                        <div className="manage-reviews">
+                            <NavLink to={"/reviews/current"} onClick={handleManageReviews}>Manage Reviews</NavLink>
                         </div>
                         <div>
                             <button className="logout" onClick={logout}>Log Out</button>

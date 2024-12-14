@@ -29,6 +29,16 @@ export const getReviewsBySpotId = (spotId) => async dispatch => {
     }
 }
 
+export const getCurrentUserReviews = () => async dispatch => {
+    const response = await csrfFetch(`/api/reviews/current`);
+
+    if (response.ok) {
+        const reviews = await response.json();
+        dispatch(loadReviews(reviews));
+        return reviews;
+    }
+}
+
 export const createReviewForSpot = (spotId, { review, stars }) => async dispatch => {
     const response = await csrfFetch(`/api/spots/${spotId}/reviews`, {
         method: 'POST',

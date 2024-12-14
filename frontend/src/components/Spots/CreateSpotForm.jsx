@@ -41,24 +41,21 @@ const CreateSpotForm = () => {
             return;
         }
 
-        try {
-            console.log('imageUrls before dispatch:', imageUrls);
-            const newSpot = await dispatch(spotActions.createSpot({
-                address,
-                city,
-                state,
-                country,
-                lat,
-                lng,
-                name,
-                description,
-                price,
-                imageUrls
-            }));
-            navigate(`/spots/${newSpot.id}`);
-        } catch (error) {
-            console.error(error);
-        }
+        const newSpot = await dispatch(spotActions.createSpot({
+            address,
+            city,
+            state,
+            country,
+            lat,
+            lng,
+            name,
+            description,
+            price,
+            imageUrls
+        }));
+        
+        navigate(`/spots/${newSpot.id}`);
+
     }
 
     return (

@@ -81,7 +81,7 @@ function SpotDetails() {
             <div className='review-container'>
                 {ratingLogic()}
                 {sessionUser &&
-                    sessionUser.id !== spotDetails.Owner.id && 
+                    sessionUser.id !== spotDetails.Owner.id &&
                     !Object.values(reviewDetails).some(review => review.userId === sessionUser.id) &&
                     <button className='create-review-button'>
                         <OpenModalMenuItem
@@ -97,13 +97,15 @@ function SpotDetails() {
                             <h3>{review.User?.firstName}</h3>
                             <p>{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
                             <p>{review.review}</p>
-                            <button className='delete-button'>
-                                <OpenModalMenuItem
-                                    itemText="Delete"
-                                    onItemClick={() => setShowModal(true)}
-                                    modalComponent={<DeleteReviewModal reviewId={review.id} spotId={spotDetails.id} />}
-                                />
-                            </button>
+                            {sessionUser && sessionUser.id === review.User.id &&
+                                <button className='delete-button'>
+                                    <OpenModalMenuItem
+                                        itemText="Delete"
+                                        onItemClick={() => setShowModal(true)}
+                                        modalComponent={<DeleteReviewModal reviewId={review.id} spotId={spotDetails.id} />}
+                                    />
+                                </button>
+                            }
                         </div>
                     ))}
             </div>

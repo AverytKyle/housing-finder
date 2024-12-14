@@ -22,7 +22,7 @@
     padding: 2px 0;
 }
 
-.manage-spots {
+.manage-reviews {
     border-bottom: 2px solid black;
 }
 
@@ -97,6 +97,7 @@
 .logo {
     display: flex;
     align-items: center;
+    width: 190px;
 }
 
 .logo-text {

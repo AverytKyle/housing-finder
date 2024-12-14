@@ -110,6 +110,7 @@ const UpdateSpot = () => {
                         type="text"
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
+                        placeholder="Country"
                         required
                     />
                 </label>
@@ -119,6 +120,7 @@ const UpdateSpot = () => {
                         type="text"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Street Address"
                         required
                     />
                 </label>
@@ -129,6 +131,7 @@ const UpdateSpot = () => {
                             type="text"
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
+                            placeholder="City"
                             required
                         />
                     </label>
@@ -138,6 +141,7 @@ const UpdateSpot = () => {
                             type="text"
                             value={state}
                             onChange={(e) => setState(e.target.value)}
+                            placeholder="State"
                             required
                         />
                     </label>
@@ -149,6 +153,7 @@ const UpdateSpot = () => {
                             type="text"
                             value={lat}
                             onChange={(e) => setLat(e.target.value)}
+                            placeholder="Latitude"
                         />
                     </label>
                     <label className="lat-lng-label">
@@ -157,6 +162,7 @@ const UpdateSpot = () => {
                             type="text"
                             value={lng}
                             onChange={(e) => setLng(e.target.value)}
+                            placeholder="Longitude"
                         />
                     </label>
                 </div>
@@ -168,6 +174,7 @@ const UpdateSpot = () => {
                             type="text"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Please write at least 30 characters"
                             required
                         />
                     </label>
@@ -181,6 +188,7 @@ const UpdateSpot = () => {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                            placeholder="Name of your spot"
                             required
                         />
                     </label>
@@ -192,10 +200,11 @@ const UpdateSpot = () => {
                     <label className="price-label">
                         <div className="price">
                             <span className="dollar-sign">$</span>
-                            <input className="description-input-box"
+                            <input className="price-input"
                                 type="text"
                                 value={price}
                                 onChange={(e) => setPrice(e.target.value)}
+                                placeholder="Price per night (USD)"
                                 required
                             />
                         </div>
@@ -215,13 +224,13 @@ const UpdateSpot = () => {
                                     newUrls[index] = e.target.value;
                                     setImageUrls(newUrls);
                                 }}
-                                placeholder="Image URL"
+                                placeholder={index === 0 ? "Preview Image URL" : "Image URL"}
                             />
                         </label>
                     ))}
                 </div>
                 <div className="button-container">
-                    <button className="create-spot-button">Create Spot</button>
+                    <button className="create-spot-button">Update your Spot</button>
                 </div>
             </form>
         </div>
