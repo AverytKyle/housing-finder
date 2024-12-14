@@ -104,6 +104,11 @@
     margin-right: 10px;
 }
 
+.price-input {
+    width: 98%;
+    margin-bottom: 0px !important;
+}
+
 .price {
     display: flex;
 }

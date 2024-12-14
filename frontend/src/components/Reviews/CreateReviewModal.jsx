@@ -32,6 +32,7 @@ function CreateReviewModal({ spotId }) {
             .then(() => {
                 closeModal();
                 dispatch(spotActions.getSpotById(spotId));
+                dispatch(reviewActions.getReviewsBySpotId(spotId));
             })
             .catch((error) => {
                 if (error.errors) {
@@ -82,7 +83,7 @@ function CreateReviewModal({ spotId }) {
                         />
                     ))}
                 </div>
-                <button className='submit-button' type="submit" disabled={review.length < 10} onClick={handleSubmit}>Submit Your Review</button>
+                <button className='submit-button' type="submit" disabled={review.length < 10 || stars === 0} onClick={handleSubmit}>Submit Your Review</button>
             </form>
         </div>
     );

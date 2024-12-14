@@ -31,6 +31,29 @@ function SpotDetails() {
         alert('Feature Coming Soon...')
     };
 
+    const ratingLogic = () => {
+        if (spotDetails.numReviews === 0 && sessionUser && sessionUser.id !== spotDetails.Owner.id) {
+            return (
+                <div>
+                    <h2><FontAwesomeIcon icon={faStarSolid} /> New</h2>
+                    <p style={{ fontSize: '15pt' }}>Be the first to post a review!</p>
+                </div>
+            );
+        } else if (spotDetails.numReviews === 0) {
+            return (
+                <h2><FontAwesomeIcon icon={faStarSolid} /> New</h2>
+            )
+        } else if (spotDetails.numReviews === 1) {
+            return (
+                <h2><FontAwesomeIcon icon={faStarSolid} /> {spotDetails.avgStarRating} &#x2022; {spotDetails.numReviews} review</h2>
+            )
+        } else {
+            return (
+                <h2><FontAwesomeIcon icon={faStarSolid} /> {spotDetails.avgStarRating} &#x2022; {spotDetails.numReviews} reviews</h2>
+            )
+        }
+    }
+
     return (
         <div className='spot-details-reviews'>
             <h2 className='spot-name'>{spotDetails.name}</h2>
@@ -56,11 +79,10 @@ function SpotDetails() {
                 </div>
             </div>
             <div className='review-container'>
-                <h2>
-                    <FontAwesomeIcon icon={faStarSolid} /> {spotDetails.avgStarRating === '0.0' ? 'New' : spotDetails.avgStarRating} &#x2022; {spotDetails.numReviews === 1 ? spotDetails.numReviews + ' review' : spotDetails.numReviews + ' reviews'}
-                </h2>
+                {ratingLogic()}
                 {sessionUser &&
-                    (sessionUser.id !== spotDetails.Owner.id && reviewDetails.userId !== sessionUser.id) &&
+                    sessionUser.id !== spotDetails.Owner.id && 
+                    !Object.values(reviewDetails).some(review => review.userId === sessionUser.id) &&
                     <button className='create-review-button'>
                         <OpenModalMenuItem
                             itemText="Post a Review"
@@ -68,20 +90,22 @@ function SpotDetails() {
                             modalComponent={<CreateReviewModal spotId={spotId} />}
                         />
                     </button>}
-                {Object.values(reviewDetails) && Object.values(reviewDetails).map((review, index) => (
-                    <div key={index} className='review-item'>
-                        <h3>{review.User?.firstName}</h3>
-                        <p>{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
-                        <p>{review.review}</p>
-                        <button className='delete-button'>
-                            <OpenModalMenuItem
-                                itemText="Delete"
-                                onItemClick={() => setShowModal(true)}
-                                modalComponent={<DeleteReviewModal reviewId={review.id} spotId={spotDetails.id} />}
-                            />
-                        </button>
-                    </div>
-                ))}
+                {Object.values(reviewDetails) && Object.values(reviewDetails)
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .map((review, index) => (
+                        <div key={index} className='review-item'>
+                            <h3>{review.User?.firstName}</h3>
+                            <p>{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+                            <p>{review.review}</p>
+                            <button className='delete-button'>
+                                <OpenModalMenuItem
+                                    itemText="Delete"
+                                    onItemClick={() => setShowModal(true)}
+                                    modalComponent={<DeleteReviewModal reviewId={review.id} spotId={spotDetails.id} />}
+                                />
+                            </button>
+                        </div>
+                    ))}
             </div>
         </div >
     );

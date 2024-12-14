@@ -32,6 +32,9 @@ const CreateSpotForm = () => {
         if (description.length < 30) frontendErrors.description = "Description needs 30 or more characters";
         if (name.length < 2) frontendErrors.name = "Name must be at least 2 characters";
         if (price <= 0 || isNaN(price)) frontendErrors.price = "Price is required";
+        if (lat === "") frontendErrors.lat = "Latitude is required";
+        if (lng === "") frontendErrors.lng = "Longitude is required";
+        if (imageUrls[0] === "") frontendErrors.imageUrls = "The preview image URL is required";
 
         if (Object.keys(frontendErrors).length > 0) {
             setErrors(frontendErrors);
@@ -40,7 +43,7 @@ const CreateSpotForm = () => {
 
         try {
             console.log('imageUrls before dispatch:', imageUrls);
-            await dispatch(spotActions.createSpot({
+            const newSpot = await dispatch(spotActions.createSpot({
                 address,
                 city,
                 state,
@@ -52,8 +55,7 @@ const CreateSpotForm = () => {
                 price,
                 imageUrls
             }));
-
-            navigate('/');
+            navigate(`/spots/${newSpot.id}`);
         } catch (error) {
             console.error(error);
         }
@@ -71,6 +73,7 @@ const CreateSpotForm = () => {
                         type="text"
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
+                        placeholder="Country"
                         required
                     />
                 </label>
@@ -80,6 +83,7 @@ const CreateSpotForm = () => {
                         type="text"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Street Address"
                         required
                     />
                 </label>
@@ -90,6 +94,7 @@ const CreateSpotForm = () => {
                             type="text"
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
+                            placeholder="City"
                             required
                         />
                     </label>
@@ -99,6 +104,7 @@ const CreateSpotForm = () => {
                             type="text"
                             value={state}
                             onChange={(e) => setState(e.target.value)}
+                            placeholder="State"
                             required
                         />
                     </label>
@@ -110,6 +116,7 @@ const CreateSpotForm = () => {
                             type="text"
                             value={lat}
                             onChange={(e) => setLat(e.target.value)}
+                            placeholder="Latitude"
                         />
                     </label>
                     <label className="lat-lng-label">
@@ -118,17 +125,19 @@ const CreateSpotForm = () => {
                             type="text"
                             value={lng}
                             onChange={(e) => setLng(e.target.value)}
+                            placeholder="Longitude"
                         />
                     </label>
                 </div>
                 <div>
                     <h2 className="line">Describe your spot to guests</h2>
-                    <p>Mention the best features of your space, any special amentities like fast wifi or parking, and what you love about the neighborhood.</p>
+                    <p>Mention the best features of your space, any special amenities like fast wifi or parking, and what you love about the neighborhood.</p>
                     <label className="description-label">
                         <textarea className="description-input-box"
                             type="text"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Please write at least 30 characters"
                             required
                         />
                     </label>
@@ -142,6 +151,7 @@ const CreateSpotForm = () => {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                            placeholder="Name of your spot"
                             required
                         />
                     </label>
@@ -153,10 +163,11 @@ const CreateSpotForm = () => {
                     <label className="price-label">
                         <div className="price">
                             <span className="dollar-sign">$</span>
-                            <input className="description-input-box"
-                                type="text"
+                            <input className="price-input"
+                                type="number"
                                 value={price}
                                 onChange={(e) => setPrice(e.target.value)}
+                                placeholder="Price per night (USD)"
                                 required
                             />
                         </div>
@@ -166,6 +177,7 @@ const CreateSpotForm = () => {
                 <div className="image-container">
                     <h2 className="line">Add a photo for your spot</h2>
                     <p>Submit a link to at least one photo to publish your spot.</p>
+                    {errors.imageUrls && <p className="errors">{errors.imageUrls}</p>}
                     {imageUrls.map((url, index) => (
                         <label key={index} className="image-label">
                             <input
@@ -176,7 +188,7 @@ const CreateSpotForm = () => {
                                     newUrls[index] = e.target.value;
                                     setImageUrls(newUrls);
                                 }}
-                                placeholder="Image URL"
+                                placeholder={index === 0 ? "Preview Image URL" : "Image URL"}
                             />
                         </label>
                     ))}
