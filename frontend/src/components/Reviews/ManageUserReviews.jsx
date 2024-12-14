@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import * as reviewActions from '../../store/reviews';
-import { useNavigate } from "react-router-dom";
 import { createSelector } from 'reselect';
 import OpenModalMenuItem from "../Navigation/OpenModalMenuItem";
 import DeleteReviewModal from "./DeleteReviewModal";
@@ -17,10 +16,6 @@ const ManageUserReviews = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [, setShowModal] = useState(false);
     const reviews = useSelector(selectReviews);
-
-    if (!reviews) {
-        return <div>Loading...</div>;
-    }
 
     useEffect(() => {
         dispatch(reviewActions.getCurrentUserReviews())
