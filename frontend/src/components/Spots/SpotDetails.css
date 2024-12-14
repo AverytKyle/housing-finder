@@ -103,3 +103,9 @@
     cursor: pointer;
     background-color: #1f4e78;
 }
+
+.update-delete {
+    display: flex;
+    justify-content: space-between;
+    width: 210px;
+}

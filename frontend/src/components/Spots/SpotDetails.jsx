@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { getSpotById } from '../../store/spots';
 import { getReviewsBySpotId } from '../../store/reviews';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,6 +14,7 @@ import DeleteReviewModal from '../Reviews/DeleteReviewModal';
 function SpotDetails() {
     const { spotId } = useParams();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const spotDetails = useSelector(state => state.spots.allSpots);
     const reviewDetails = useSelector(state => state.reviews.reviews)
     const sessionUser = useSelector((state) => state.session.user);
@@ -30,6 +32,10 @@ function SpotDetails() {
     const handleReserveClick = () => {
         alert('Feature Coming Soon...')
     };
+
+    const handleUpdateClick = () => {
+        navigate('/reviews/current');
+    }
 
     const ratingLogic = () => {
         if (spotDetails.numReviews === 0 && sessionUser && sessionUser.id !== spotDetails.Owner.id) {
@@ -98,13 +104,18 @@ function SpotDetails() {
                             <p>{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
                             <p>{review.review}</p>
                             {sessionUser && sessionUser.id === review.User.id &&
-                                <button className='delete-button'>
-                                    <OpenModalMenuItem
-                                        itemText="Delete"
-                                        onItemClick={() => setShowModal(true)}
-                                        modalComponent={<DeleteReviewModal reviewId={review.id} spotId={spotDetails.id} />}
-                                    />
-                                </button>
+                                <div className='update-delete'>
+                                    <button className="delete-button" onClick={handleUpdateClick}>
+                                        Update 
+                                    </button>
+                                    <button className='delete-button'>
+                                        <OpenModalMenuItem
+                                            itemText="Delete"
+                                            onItemClick={() => setShowModal(true)}
+                                            modalComponent={<DeleteReviewModal reviewId={review.id} spotId={spotDetails.id} />}
+                                        />
+                                    </button>
+                                </div>
                             }
                         </div>
                     ))}
