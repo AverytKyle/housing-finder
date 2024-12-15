@@ -1,14 +1,16 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useModal } from '../../context/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import * as reviewActions from '../../store/reviews';
+import * as spotActions from '../../store/spots';
 import './CreateReviewModal.css';
 
 function UpdateReviewModal({ reviewId }) {
     const review = useSelector(state => state.reviews.reviews[reviewId]);
+    const spot = useSelector(state => state.spots.allSpots);
     const { closeModal } = useModal();
     const dispatch = useDispatch();
     const [reviewText, setReviewText] = useState(review.review);
@@ -16,7 +18,11 @@ function UpdateReviewModal({ reviewId }) {
     const [hoveredStar, setHoveredStar] = useState(0);
     const [errors, setErrors] = useState({});
 
-    if (!review || !review.Spot) {
+    useEffect(() => {
+        dispatch(spotActions.getSpotById(review.spotId));
+    }, [dispatch, review.spotId]);
+
+    if (!review) {
         return <div>Loading...</div>;
     }
 
@@ -52,7 +58,7 @@ function UpdateReviewModal({ reviewId }) {
 
     return (
         <div className="create-review-modal">
-            <h2 className='title'>How was your stay at {review.Spot.name}?</h2>
+            <h2 className='title'>How was your stay at {spot.name}?</h2>
             <form className='review-form'>
                 {errors.review && <p className="errors" style={{ color: 'red', margin: '5px 0' }}>{errors.review}</p>}
                 <label>

@@ -37,37 +37,66 @@ function SpotDetails() {
         navigate('/reviews/current');
     }
 
-    const ratingLogic = () => {
-        if (spotDetails.numReviews === 0 && sessionUser && sessionUser.id !== spotDetails.Owner.id) {
+    const ratingAndButtonLogic = () => {
+        const userHasReview = Object.values(reviewDetails).some(review => review.userId === sessionUser?.id);
+
+        if (spotDetails.numReviews === 0 && sessionUser && sessionUser.id !== spotDetails.Owner.id && !userHasReview) {
             return (
                 <div>
                     <h2><FontAwesomeIcon icon={faStarSolid} /> New</h2>
                     <p style={{ fontSize: '15pt' }}>Be the first to post a review!</p>
+                    <button className='create-review-button'>
+                        <OpenModalMenuItem
+                            itemText="Post a Review"
+                            onItemClick={() => setShowModal(true)}
+                            modalComponent={<CreateReviewModal spotId={spotId} />}
+                        />
+                    </button>
                 </div>
             );
         } else if (spotDetails.numReviews === 0) {
             return (
                 <h2><FontAwesomeIcon icon={faStarSolid} /> New</h2>
-            )
-        } else if (spotDetails.numReviews === 1) {
-            return (
-                <h2><FontAwesomeIcon icon={faStarSolid} /> {spotDetails.avgStarRating} &#x2022; {spotDetails.numReviews} review</h2>
-            )
+            );
         } else {
             return (
-                <h2><FontAwesomeIcon icon={faStarSolid} /> {spotDetails.avgStarRating} &#x2022; {spotDetails.numReviews} reviews</h2>
-            )
+                <div>
+                    <h2>
+                        <FontAwesomeIcon icon={faStarSolid} />
+                        {spotDetails.avgStarRating} &#x2022;
+                        {spotDetails.numReviews === 1 ?
+                            `${spotDetails.numReviews} review` :
+                            `${spotDetails.numReviews} reviews`}
+                    </h2>
+                    {sessionUser &&
+                        sessionUser.id !== spotDetails.Owner.id &&
+                        !userHasReview && (
+                            <button className='create-review-button'>
+                                <OpenModalMenuItem
+                                    itemText="Post a Review"
+                                    onItemClick={() => setShowModal(true)}
+                                    modalComponent={<CreateReviewModal spotId={spotId} />}
+                                />
+                            </button>
+                        )}
+                </div>
+            );
         }
-    }
+    };
 
     return (
         <div className='spot-details-reviews'>
             <h2 className='spot-name'>{spotDetails.name}</h2>
             <h3 className='location'>{spotDetails.city}, {spotDetails.state}, {spotDetails.country}</h3>
-            <div className='img-container'>
-                {spotDetails.SpotImages.map((image, index) => (
-                    <img key={index} src={image.url} />
-                ))}
+            <div className="image-container">
+                <div className="main-image">
+                    <img src={spotDetails.SpotImages[0].url} alt="Main spot view" />
+                </div>
+                <div className="image-grid">
+                    {spotDetails.SpotImages.slice(1, 5).map((image, index) => (
+                        <img key={index} src={image.url} alt={`Spot view ${index + 2}`} />
+                    ))}
+                </div>
             </div>
             <div className='descrip-price'>
                 <div className='description-container'>
@@ -77,7 +106,7 @@ function SpotDetails() {
                 <div key={spotDetails.id} className='price-reserve-box'>
                     <div className='price-reviews'>
                         <p className='price'>${spotDetails.price} night</p>
-                        <p className='raiting-reviews'>{spotDetails.avgStarRating} Stars &#x2022; {spotDetails.numReviews} reviews</p>
+                        <p className='raiting-reviews'>{spotDetails.avgStarRating} Stars &#x2022; {spotDetails.numReviews === 1 ? `${spotDetails.numReviews} review` : `${spotDetails.numReviews} reviews`}</p>
                     </div>
                     <div className='button'>
                         <button className='reserve-button' onClick={handleReserveClick} type='submit'>Reserve</button>
@@ -85,28 +114,18 @@ function SpotDetails() {
                 </div>
             </div>
             <div className='review-container'>
-                {ratingLogic()}
-                {sessionUser &&
-                    sessionUser.id !== spotDetails.Owner.id &&
-                    !Object.values(reviewDetails).some(review => review.userId === sessionUser.id) &&
-                    <button className='create-review-button'>
-                        <OpenModalMenuItem
-                            itemText="Post a Review"
-                            onItemClick={() => setShowModal(true)}
-                            modalComponent={<CreateReviewModal spotId={spotId} />}
-                        />
-                    </button>}
+                {ratingAndButtonLogic()}
                 {Object.values(reviewDetails) && Object.values(reviewDetails)
                     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                     .map((review, index) => (
                         <div key={index} className='review-item'>
                             <h3>{review.User?.firstName}</h3>
-                            <p>{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
-                            <p>{review.review}</p>
+                            <p className='date'>{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+                            <p className='review-text'>{review.review}</p>
                             {sessionUser && sessionUser.id === review.User.id &&
                                 <div className='update-delete'>
                                     <button className="delete-button" onClick={handleUpdateClick}>
-                                        Update 
+                                        Update
                                     </button>
                                     <button className='delete-button'>
                                         <OpenModalMenuItem

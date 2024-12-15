@@ -34,15 +34,16 @@ const ManageUserReviews = () => {
                     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                     .map((review, index) => (
                         <div key={index} className="review-card">
+                            {/* {spotById(review.Spot.id)} */}
                             <h2>{review.Spot.name}</h2>
                             <p>{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
-                            <p>{review.review}</p>
+                            <p className="review-text">{review.review}</p>
                             <div className="button-container">
                                 <button className="delete-button">
                                     <OpenModalMenuItem
                                         itemText="Update"
                                         onItemClick={() => setShowModal(true)}
-                                        modalComponent={<UpdateReviewModal reviewId={review.id} spotId={review.Spot.id} />}
+                                        modalComponent={<UpdateReviewModal reviewId={review.id} />}
                                     />
                                 </button>
                                 <button className="delete-button">
