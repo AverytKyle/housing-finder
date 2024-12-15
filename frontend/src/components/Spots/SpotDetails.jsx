@@ -115,7 +115,7 @@ function SpotDetails() {
             </div>
             <div className='review-container'>
                 {ratingAndButtonLogic()}
-                {Object.values(reviewDetails) && Object.values(reviewDetails)
+                {Object.values(reviewDetails) && sessionUser && Object.values(reviewDetails)
                     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                     .map((review, index) => (
                         <div key={index} className='review-item'>

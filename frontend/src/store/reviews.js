@@ -32,12 +32,19 @@ const loadUserReviews = reviews => ({
 });
 
 export const getReviewsBySpotId = (spotId) => async dispatch => {
-    const response = await csrfFetch(`/api/spots/${spotId}/reviews`);
+    try {
+        const response = await csrfFetch(`/api/spots/${spotId}/reviews`);
 
-    if (response.ok) {
-        const reviews = await response.json();
-        dispatch(loadReviews(reviews));
-        return reviews;
+        if (response.ok) {
+            const reviews = await response.json();
+            dispatch(loadReviews(reviews));
+            return reviews;
+        } else {
+            const error = await response.json();
+            throw new Error(error.message);
+        }
+    } catch (error) {
+        return error;
     }
 }
 
