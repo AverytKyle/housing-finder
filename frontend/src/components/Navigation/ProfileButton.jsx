@@ -50,7 +50,6 @@ const ProfileButton = ({ user }) => {
     };
 
     const handleManageReviews = () => {
-
         closeMenu();
     }
 
@@ -90,7 +89,7 @@ const ProfileButton = ({ user }) => {
                         <div className="signup-modal">
                             <OpenModalMenuItem
                                 itemText="Sign Up"
-                                onItemlick={closeMenu}
+                                onItemClick={closeMenu}
                                 modalComponent={<SignupFormModal />}
                             />
                         </div>
