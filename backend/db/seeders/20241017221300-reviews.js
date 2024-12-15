@@ -50,7 +50,7 @@ module.exports = {
       },
       {
         spotId: 4,
-        userId: 1,
+        userId: 2,
         review: 'Cozy condo, perfect for a getaway.',
         stars: 3
       },
@@ -74,7 +74,7 @@ module.exports = {
       },
       {
         spotId: 6,
-        userId: 1,
+        userId: 2,
         review: 'Cozy condo, perfect for a getaway.',
         stars: 4
       },
