@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import * as reviewActions from '../../store/reviews';
+import * as spotActions from '../../store/spots';
 import { createSelector } from 'reselect';
 import OpenModalMenuItem from "../Navigation/OpenModalMenuItem";
 import DeleteReviewModal from "./DeleteReviewModal";
@@ -8,17 +9,22 @@ import UpdateReviewModal from "./UpdateReviewModal";
 
 const selectReviews = createSelector(
     (state) => state.reviews.reviews,
-    (reviews) => Object.values(reviews)
+    (state) => state.session.user?.id,
+    (reviews, userId) => Object.values(reviews).filter(review => review.userId === userId)
 );
+
+const selectSpots = (state) => state.spots.allSpots;
 
 const ManageUserReviews = () => {
     const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState(true);
     const [, setShowModal] = useState(false);
     const reviews = useSelector(selectReviews);
+    const spots = useSelector(selectSpots);
 
     useEffect(() => {
         dispatch(reviewActions.getCurrentUserReviews())
+            .then(() => dispatch(spotActions.getSpots()))
             .then(() => setIsLoading(false));
     }, [dispatch]);
 
@@ -34,8 +40,7 @@ const ManageUserReviews = () => {
                     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                     .map((review, index) => (
                         <div key={index} className="review-card">
-                            {/* {spotById(review.Spot.id)} */}
-                            <h2>{review.Spot.name}</h2>
+                            <h2>{spots[review.spotId]?.name}</h2>
                             <p>{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
                             <p className="review-text">{review.review}</p>
                             <div className="button-container">
@@ -50,7 +55,7 @@ const ManageUserReviews = () => {
                                     <OpenModalMenuItem
                                         itemText="Delete"
                                         onItemClick={() => setShowModal(true)}
-                                        modalComponent={<DeleteReviewModal reviewId={review.id} spotId={review.Spot.id} />}
+                                        modalComponent={<DeleteReviewModal reviewId={review.id} spotId={review.spotId} />}
                                     />
                                 </button>
                             </div>

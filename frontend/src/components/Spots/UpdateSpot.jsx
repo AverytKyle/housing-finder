@@ -211,7 +211,7 @@ const UpdateSpot = () => {
                     </label>
                     {errors.price && <p className="errors">{errors.price}</p>}
                 </div>
-                <div className="image-container">
+                <div className="create-image-container">
                     <h2 className="line">Add a photo for your spot</h2>
                     <p>Submit a link to at least one photo to publish your spot.</p>
                     {imageUrls.map((url, index) => (

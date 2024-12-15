@@ -122,7 +122,7 @@ function SpotDetails() {
                             <h3>{review.User?.firstName}</h3>
                             <p className='date'>{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
                             <p className='review-text'>{review.review}</p>
-                            {sessionUser && sessionUser.id === review.User.id &&
+                            {sessionUser && review.User && sessionUser.id === review.User.id &&
                                 <div className='update-delete'>
                                     <button className="delete-button" onClick={handleUpdateClick}>
                                         Update

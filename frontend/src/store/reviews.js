@@ -4,6 +4,7 @@ const LOAD = 'reviews/LOAD';
 const CREATE_REVIEW = 'reviews/CREATE_REVIEW';
 const DELETE_REVIEW = 'reviews/DELETE_REVIEW';
 const UPDATE_REVIEW = 'reviews/UPDATE_REVIEW';
+const LOAD_USER_REVIEWS = 'reviews/LOAD_USER_REVIEWS';
 
 const loadReviews = reviews => ({
     type: LOAD,
@@ -25,6 +26,11 @@ const updateReview = review => ({
     review
 });
 
+const loadUserReviews = reviews => ({
+    type: LOAD_USER_REVIEWS,
+    reviews
+});
+
 export const getReviewsBySpotId = (spotId) => async dispatch => {
     const response = await csrfFetch(`/api/spots/${spotId}/reviews`);
 
@@ -40,7 +46,7 @@ export const getCurrentUserReviews = () => async dispatch => {
 
     if (response.ok) {
         const reviews = await response.json();
-        dispatch(loadReviews(reviews));
+        dispatch(loadUserReviews(reviews));
         return reviews;
     }
 }
@@ -114,6 +120,14 @@ const reviewsReducer = (state = initialState, action) => {
         case UPDATE_REVIEW: {
             const newState = { ...state };
             newState.reviews[action.review.id] = action.review;
+            return newState;
+        }
+        case LOAD_USER_REVIEWS: {
+            const newState = { ...state };
+            newState.reviews = {};
+            action.reviews.Reviews.forEach(review => {
+                newState.reviews[review.id] = review;
+            });
             return newState;
         }
         default: 
