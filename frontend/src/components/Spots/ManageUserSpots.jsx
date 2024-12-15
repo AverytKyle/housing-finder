@@ -39,7 +39,7 @@ const ManageUserSpots = () => {
                     }}>
                         <div className="tool-tip">
                             <div className='spot-stuff'>
-                                <img className='spot-img' src={spot.previewImage} alt={spot.name} />
+                                <img className='mng-spot-img' src={spot.previewImage} alt={spot.name} />
                                 <div className='spot-info-container'>
                                     <p>{spot.city}, {spot.state}</p>
                                     <p> {spot.avgRating}</p>
